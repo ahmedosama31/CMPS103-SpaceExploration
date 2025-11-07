@@ -125,10 +125,12 @@
   <ItemGroup>
     <ClInclude Include="ArrayStack.h" />
     <ClInclude Include="LinkedQueue.h" />
-    <ClInclude Include="Mission.h" />
+    <ClInclude Include="mission.h" />
     <ClInclude Include="Node.h" />
+    <ClInclude Include="OUT_Missions.h" />
     <ClInclude Include="priNode.h" />
     <ClInclude Include="QueueADT.h" />
+    <ClInclude Include="RDY_NM.h" />
     <ClInclude Include="StackADT.h" />
   </ItemGroup>
   <ItemGroup>

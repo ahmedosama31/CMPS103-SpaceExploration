@@ -4,7 +4,7 @@
 using namespace std;
 class rover; // forward declaration so we can use a pointer without including rover.h untill rover class is made
 
-class Mission {
+class mission {
 private:
 	int ID;
 	char Type;
@@ -17,7 +17,7 @@ private:
 	rover* AssignedRover;
 public:
 	// Constructor
-	Mission(int id = 0,char type,int targetlocation=0, int missionduration = 0, int requestday = 0)
+	mission(int id = 0,char type,int targetlocation=0, int missionduration = 0, int requestday = 0)
 		: ID(id), Type(type), TargetLocation(targetlocation), MissionDuration(missionduration),
 		RequestedDay(requestday), WaitingDays(0), ExecutionDays(0), CompletionDay(0), AssignedRover(nullptr) {
 	}
