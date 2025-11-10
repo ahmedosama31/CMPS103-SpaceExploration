@@ -17,7 +17,7 @@ private:
 	rover* AssignedRover;
 public:
 	// Constructor
-	mission(int id = 0,char type,int targetlocation=0, int missionduration = 0, int requestday = 0)
+	mission(int id = 0,char type = 'N', int targetlocation = 0, int missionduration = 0, int requestday = 0)
 		: ID(id), Type(type), TargetLocation(targetlocation), MissionDuration(missionduration),
 		RequestedDay(requestday), WaitingDays(0), ExecutionDays(0), CompletionDay(0), AssignedRover(nullptr) {
 	}
