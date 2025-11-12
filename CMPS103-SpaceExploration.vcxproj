@@ -128,6 +128,7 @@
     <ClInclude Include="Node.h" />
     <ClInclude Include="priNode.h" />
     <ClInclude Include="QueueADT.h" />
+    <ClInclude Include="rover.h" />
     <ClInclude Include="StackADT.h" />
   </ItemGroup>
   <ItemGroup>
