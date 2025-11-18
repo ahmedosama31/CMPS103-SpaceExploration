@@ -66,5 +66,24 @@ public:
         return completedMissions >= missionsBeforeCheckup;
     }
 
+    friend ostream& operator<<(ostream& os, const Rover& r) {
+        os << "[Rover ID: " << r.ID << ", Type: ";
 
+        if (r.type == DIGGING)
+            os << "D";
+        else if (r.type == POLAR)
+            os << "P";
+        else
+            os << "N";
+
+        os << ", Speed: " << r.speed << " km/h"
+            << ", Missions Before Checkup: " << r.missionsBeforeCheckup
+            << ", Completed Missions: " << r.completedMissions
+            << ", Total Distance: " << r.totalDistance << " km"
+            << ", In Checkup: " << (r.inCheckup ? "Yes" : "No")
+            << ", Available Day: " << r.availableDay
+            << "]";
+
+        return os;
+    }
 };
