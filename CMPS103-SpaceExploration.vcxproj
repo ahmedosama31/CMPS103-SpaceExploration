@@ -130,6 +130,7 @@
     <ClInclude Include="OUT_Missions.h" />
     <ClInclude Include="priNode.h" />
     <ClInclude Include="QueueADT.h" />
+    <ClInclude Include="rover.h" />
     <ClInclude Include="RDY_NM.h" />
     <ClInclude Include="StackADT.h" />
   </ItemGroup>
