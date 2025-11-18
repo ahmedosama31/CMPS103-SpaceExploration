@@ -126,6 +126,7 @@
     <ClInclude Include="abortRequest.h" />
     <ClInclude Include="ArrayStack.h" />
     <ClInclude Include="LinkedQueue.h" />
+    <ClInclude Include="MarsStation.h" />
     <ClInclude Include="mission.h" />
     <ClInclude Include="MissionType.h" />
     <ClInclude Include="newRequest.h" />
