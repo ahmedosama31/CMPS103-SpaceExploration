@@ -136,7 +136,6 @@
     <ClInclude Include="RDY_NM.h" />
     <ClInclude Include="Requests.h" />
     <ClInclude Include="rover.h" />
-    <ClInclude Include="RDY_NM.h" />
     <ClInclude Include="StackADT.h" />
   </ItemGroup>
   <ItemGroup>
