@@ -1,16 +1,16 @@
 #pragma once
-
+#include "MarsStation.h"
 class Requests
 {
 protected:
-	int Rday;
+	int RDay;
 	int missionID;
 public:
-	Requests(int rday, int id) : Rday(rday), missionID(id) {}
-	virtual void Operate() = 0;
-	int getRday() const { return Rday; }
+	Requests(int rday, int id) : RDay(rday), missionID(id) {}
+	virtual void Operate(MarsStation& marsStation) = 0;
+	int getRday() const { return RDay; }
 	int getMissionID() const { return missionID; }
-	void setRday(int Rday) { this->Rday = Rday; }	
+	void setMday(int Rday) { this->RDay = Rday; }	
 	void setMissionID(int missionID) { this->missionID = missionID; }
 };
 

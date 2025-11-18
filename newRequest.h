@@ -1,6 +1,7 @@
 #pragma once
 #include "Requests.h"
 #include "MissionType.h"
+#include "mission.h"
 class newRequest :public Requests
 {
 private:
@@ -16,6 +17,10 @@ public:
 	void setMissionType(MissionType MType) { this->MType = MType; }
 	void setTargetLocation(int TLOC) { this->TLOC = TLOC; }
 	void setMissionDuration(int MDUR) { this->MDUR = MDUR; }
+	void Operate(MarsStation& marsStation) override {
+		mission* M = new mission(getMissionID(), getMissionType(), getTargetLocation(), getMissionDuration(), getRday());
+		marsStation.InsertMission(M);
+	}
 
 
 };

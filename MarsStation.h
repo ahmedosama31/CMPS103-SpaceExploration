@@ -2,48 +2,114 @@
 
 #include <iostream>
 #include <fstream>
+using namespace std;
 #include "LinkedQueue.h"
+#include "RDY_NM.h"
 #include "rover.h"
-#include "mission.h"
+#include "mission.h"    
+#include "Requests.h"
+#include "newRequest.h"
+#include "abortRequest.h"
+#include "MissionType.h"
 
-template <typename T>
 class MarsStation {
 private:
+    LinkedQueue<Rover*> CheckupDiggingRovers;
+    LinkedQueue<Rover*> CheckupPolarRovers;
+    LinkedQueue<Rover*> CheckupNormalRovers;
+    LinkedQueue<Rover*> AvailableDiggingRovers;
+    LinkedQueue<Rover*> AvailablePolarRovers;
+    LinkedQueue<Rover*> AvailableNormalRovers;
+    LinkedQueue<Requests*> RequestsList;
+    LinkedQueue<mission*> ReadyDiggingMissions;
+    LinkedQueue<mission*> ReadyPolarMissions;
+    RDY_NM ReadyNormalMissions;
+   
+    
+public:
+    int D = 0, P = 0, N = 0;
+    int SD = 0, SP = 0, SN = 0;
+    int M = 0;
+    int CD = 0, CP = 0, CN = 0;
+    void LoadFromFile(const string& filename)
+    {
+        std::ifstream inputFile(filename);
 
-    MarsStation() {
-        ifstream inputfile("input.txt");
-        if (!inputfile.is_open()) {
-            return;
+        if (!inputFile.is_open()) { return; }
+
+        inputFile >> D >> P >> N;
+        inputFile >> SD >> SP >> SN;
+        inputFile >> M >> CD >> CP >> CN;
+        int id = 1;
+        for (int i=0; i < D; i++)
+            AvailableDiggingRovers.enqueue(
+                new Rover(id++, MissionType::Digging, SD, M, CD));
+        for (int i=0; i < P; i++)
+            AvailablePolarRovers.enqueue(
+                new Rover(id++, MissionType::Polar, SP, M, CP));
+        for (int i=0; i < N; i++)
+            AvailableNormalRovers.enqueue(
+                new Rover(id++, MissionType::Normal, SN, M, CN));
+
+        int K;
+        inputFile >> K;
+        for (int i = 0; i < K; i++) {
+            char RType; inputFile >> RType;
+            if (RType == 'R')
+            {
+                char MType;
+                int RDay, ID, TLOC, MDUR;
+                inputFile >> MType >> RDay >> ID >> TLOC >> MDUR;
+                RequestsList.enqueue(new newRequest(RDay, ID, CharToMType(MType), TLOC, MDUR));
+            }
+            else if (RType == 'X') {
+                int XDay, ID;
+                inputFile >> XDay >> ID;
+                RequestsList.enqueue(new abortRequest(XDay, ID));
+            }
         }
+    inputFile.close();
+    }
 
-        int DR, PR, NR;
-        inputfile >> DR >> PR >> NR;
-        getline(inputfile);   // move to the next line
+    void ExecuteRequests(int currentDay)
+    {
+        Requests* req = nullptr;
 
-        int DS, PS, NS;
-        inputfile >> DS >> PS >> NS;
-        getline(inputfile);
+        while (RequestsList.peek(req)) {
 
-        int MD, MP, MN, Duration;
-        inputfile >> MD >> MP >> MN >> Duration;
-        // Rover(int id, RoverType t, double spd, int missionsBC, int checkDur)
+            if (req->getRday() > currentDay)
+                return;
 
-        // --- DIGGING ROVERS ---
-        for (int i = 0; i < DR; i++) {
-            Rover* diggingRover = new Rover(i + 1, DIGGING, DS, MD, Duration);
-            DIG_Rovers.enqueue(diggingRover);
-        }
-
-        // --- POLAR ROVERS ---
-        for (int i = 0; i < PR; i++) {
-            Rover* polarRover = new Rover(i + 1 + DR, POLAR, PS, MP, Duration);
-            POL_Rovers.enqueue(polarRover);
-        }
-
-        // --- NORMAL ROVERS ---
-        for (int i = 0; i < NR; i++) {
-            Rover* normalRover = new Rover(i + 1 + DR + PR, NORMAL, NS, MN, Duration);
-            NM_Rovers.enqueue(normalRover);
+            RequestsList.dequeue(req);
+            req->Operate(*this);
+            delete req;
         }
     }
+    void InsertMission(mission* M)
+    {
+        switch (M->getType()) {
+        case MissionType::Digging:
+            ReadyDiggingMissions.enqueue(M);
+            break;
+
+        case MissionType::Polar:
+            ReadyPolarMissions.enqueue(M);
+            break;
+
+        case MissionType::Normal:
+            ReadyNormalMissions.enqueue(M);
+            break;
+        }
+    }
+    void AbortMission(int missionID)
+    {
+   /////////////////////////
+    }
+
+
 };
+         
+         
+         
+            
+      

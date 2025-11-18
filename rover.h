@@ -1,13 +1,13 @@
 #pragma once
 #include <iostream>
 #include <string>
+#include "MissionType.h"
 using namespace std;
-enum RoverType { DIGGING, POLAR, NORMAL };
 
 class Rover {
 private:
     int ID;
-    RoverType type;
+    MissionType type;
     double speed;              // in km/h
     int missionsBeforeCheckup; // number of missions before checkup
     int checkupDuration;       // number of days in checkup
@@ -18,13 +18,8 @@ private:
 
 public:
     // ----- Constructors -----
-    Rover()
-        : ID(0), type(NORMAL), speed(0), missionsBeforeCheckup(0),
-        checkupDuration(0), completedMissions(0), totalDistance(0),
-        inCheckup(false), availableDay(0) {
-    }
 
-    Rover(int id, RoverType t, double spd, int missionsBC, int checkDur)
+    Rover(int id, MissionType t, double spd, int missionsBC, int checkDur)
         : ID(id), type(t), speed(spd), missionsBeforeCheckup(missionsBC),
         checkupDuration(checkDur), completedMissions(0),
         totalDistance(0), inCheckup(false), availableDay(0) {
@@ -32,7 +27,7 @@ public:
 
     // ----- Getters -----
     int getID() const { return ID; }
-    RoverType getType() const { return type; }
+    MissionType getType() const { return type; }
     double getSpeed() const { return speed; }
     int getMissionsBeforeCheckup() const { return missionsBeforeCheckup; }
     int getCheckupDuration() const { return checkupDuration; }
@@ -69,9 +64,9 @@ public:
     friend ostream& operator<<(ostream& os, const Rover& r) {
         os << "[Rover ID: " << r.ID << ", Type: ";
 
-        if (r.type == DIGGING)
+        if (r.type == MissionType::Digging)
             os << "D";
-        else if (r.type == POLAR)
+        else if (r.type == MissionType::Polar)
             os << "P";
         else
             os << "N";

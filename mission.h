@@ -1,13 +1,9 @@
 #pragma once
 #include <iostream>
 //#include "rover.h"
+#include "MissionType.h"
 using namespace std;
 class rover; // forward declaration so we can use a pointer without including rover.h untill rover class is made
-enum class MissionType {
-	DIGGING,
-	POLAR,
-	NORMAL
-};
 class mission {
 private:
 	int ID;
@@ -21,7 +17,7 @@ private:
 	rover* AssignedRover;
 public:
 	// Constructor
-	mission(int id = 0, MissionType type = MissionType::NORMAL, int targetlocation = 0, int missionduration = 0, int requestday = 0)
+	mission(int id = 0, MissionType type = MissionType::Normal, int targetlocation = 0, int missionduration = 0, int requestday = 0)
 		: ID(id), Type(type), TargetLocation(targetlocation), MissionDuration(missionduration),
 		RequestedDay(requestday), WaitingDays(0), ExecutionDays(0), CompletionDay(0), AssignedRover(nullptr) {
 	}
@@ -45,9 +41,9 @@ public:
 	friend ostream& operator<<(ostream& os, const mission& m) {
 		os << "[Mission ID: " << m.ID << ", Type: ";
 
-		if (m.Type == MissionType::DIGGING)
+		if (m.Type == MissionType::Digging)
 			os << "D";
-		else if (m.Type == MissionType::POLAR)
+		else if (m.Type == MissionType::Polar)
 			os << "P";
 		else
 			os << "N";
