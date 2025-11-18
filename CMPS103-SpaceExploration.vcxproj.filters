@@ -33,9 +33,6 @@
     <ClInclude Include="priNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Mission.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="priQueue.h">
