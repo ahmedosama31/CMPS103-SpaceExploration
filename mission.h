@@ -3,11 +3,15 @@
 //#include "rover.h"
 using namespace std;
 class rover; // forward declaration so we can use a pointer without including rover.h untill rover class is made
-
+enum class MissionType {
+	DIGGING,
+	POLAR,
+	NORMAL
+};
 class mission {
 private:
 	int ID;
-	char Type;
+	MissionType Type;
 	int TargetLocation;
 	int MissionDuration;
 	int RequestedDay;
@@ -17,13 +21,13 @@ private:
 	rover* AssignedRover;
 public:
 	// Constructor
-	mission(int id = 0,char type = 'N', int targetlocation = 0, int missionduration = 0, int requestday = 0)
+	mission(int id = 0, MissionType type = MissionType::NORMAL, int targetlocation = 0, int missionduration = 0, int requestday = 0)
 		: ID(id), Type(type), TargetLocation(targetlocation), MissionDuration(missionduration),
 		RequestedDay(requestday), WaitingDays(0), ExecutionDays(0), CompletionDay(0), AssignedRover(nullptr) {
 	}
 	// Getters
 	int getID() const { return ID; }
-	char getType() const { return Type; }
+	MissionType getType() const { return Type; }
 	int getRequestedDay() const { return RequestedDay; }
 	int getTargetLocation() const { return TargetLocation; }
 	int getMissionDuration() const { return MissionDuration; }
@@ -38,13 +42,20 @@ public:
 	void setCompletionDay(int c) { CompletionDay = c; }
 	void assignRover(rover* r) { AssignedRover = r; }
 
-	void print() const
-	{
-		cout << "[Mission ID: " << ID
-			<< ", Type: " << Type
-			<< ", Requested Day: " << RequestedDay
-			<< ", Target: " << TargetLocation << " km"
-			<< ", Duration: " << MissionDuration << " days]"
-			<< endl;
+	friend ostream& operator<<(ostream& os, const mission& m) {
+		os << "[Mission ID: " << m.ID << ", Type: ";
+
+		if (m.Type == MissionType::DIGGING)
+			os << "D";
+		else if (m.Type == MissionType::POLAR)
+			os << "P";
+		else
+			os << "N";
+
+		os << ", Requested Day: " << m.RequestedDay
+			<< ", Target: " << m.TargetLocation << " km"
+			<< ", Duration: " << m.MissionDuration << " days]";
+
+		return os;
 	}
 };
