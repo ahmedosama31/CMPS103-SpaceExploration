@@ -22,17 +22,32 @@ void Mission::setExecutionDays(int e) { ExecutionDays = e; }
 void Mission::setCompletionDay(int c) { CompletionDay = c; }
 void Mission::assignRover(Rover* r) { AssignedRover = r; }
 
-std::ostream& operator<<(std::ostream& os, const Mission& m) {
-    os << "[Mission ID: " << m.ID << ", Type: ";
-    if (m.Type == MissionType::Digging)
-        os << "D";
-    else if (m.Type == MissionType::Polar)
-        os << "P";
-    else
-        os << "N";
 
-    os << ", Requested Day: " << m.RequestedDay
-       << ", Target: " << m.TargetLocation << " km"
-       << ", Duration: " << m.MissionDuration << " days]";
+std::ostream& operator<<(std::ostream& os, const Mission& m)
+{
+    os << "[Mission ID: " << m.ID
+        << ", Type: ";
+
+    switch (m.Type) {
+    case MissionType::Digging: os << "D"; break;
+    case MissionType::Polar:   os << "P"; break;
+    case MissionType::Normal:  os << "N"; break;
+    }
+
+    os << ", RDay: " << m.RequestedDay
+        << ", TLOC: " << m.TargetLocation
+        << ", MDUR: " << m.MissionDuration
+        << "]";
+
     return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const Mission* m)
+{
+    if (m)
+        os << *m;   // call Mission& overload
+    else
+        os << "[NULL Mission]";
+    return os;
+}
 }

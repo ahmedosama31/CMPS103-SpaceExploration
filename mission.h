@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+using namespace std;
 #include "Enums.h"
 #include "rover.h"
 class Mission {
@@ -33,6 +34,8 @@ public:
     void setExecutionDays(int e);
     void setCompletionDay(int c);
     void assignRover(Rover* r);
-
+    
     friend std::ostream& operator<<(std::ostream& os, const Mission& m);
+    friend std::ostream& operator<<(std::ostream& os, const Mission* m);
+
 };

@@ -6,6 +6,7 @@
  @file ArrayStack.h */
 
 #include "StackADT.h"
+#include <iostream>
 
 // Unless specified by the stack user, the default size is 100
 template<typename T>
@@ -58,4 +59,13 @@ public:
     {
         return top + 1;
     }
-}; // end ArrayStack
+
+    void print() const
+    {
+        std::cout << "Stack (top to bottom): ";
+        for (int i = top; i >= 0; i--) {
+            std::cout << *items[i] << " ";
+        }
+        std::cout << std::endl;
+    }
+};

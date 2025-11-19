@@ -22,6 +22,7 @@ public:
 					previous->setNext(current->getNext());
 
 				delete current; // delete node only
+				--this->count; // decrement count
 				return m;
 			}
 			previous = current;

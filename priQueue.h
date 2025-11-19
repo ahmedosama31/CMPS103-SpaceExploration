@@ -1,5 +1,6 @@
 #pragma once
 #include "priNode.h"
+#include <iostream>     
 
 
 //This class implements the priority queue as a sorted list (Linked List)
@@ -9,8 +10,9 @@ class priQueue
 {
 protected:
     priNode<T>* head;
+    int count; 
 public:
-    priQueue() : head(nullptr) {}
+    priQueue() : head(nullptr), count(0) {}
 
     ~priQueue() {
         T tmp;
@@ -26,6 +28,7 @@ public:
 
             newNode->setNext(head);
             head = newNode;
+            ++count;
             return;
         }
 
@@ -35,6 +38,7 @@ public:
         }
         newNode->setNext(current->getNext());
         current->setNext(newNode);
+        ++count;
     }
 
     bool dequeue(T& topEntry, int& pri) {
@@ -45,6 +49,7 @@ public:
         priNode<T>* temp = head;
         head = head->getNext();
         delete temp;
+        --count;
         return true;
     }
 
@@ -59,4 +64,23 @@ public:
     bool isEmpty() const {
         return head == nullptr;
     }
+
+    int getCount() const;  
+
+    void print() const;      
 };
+
+template <typename T>
+int priQueue<T>::getCount() const { return count; }
+
+template <typename T>
+void priQueue<T>::print() const {
+    priNode<T>* cur = head;
+    while (cur) {
+        int p;
+        T item = cur->getItem(p);
+        std::cout << *item << " (pri=" << p << ") ";
+        cur = cur->getNext();
+    }
+    std::cout << std::endl;
+}

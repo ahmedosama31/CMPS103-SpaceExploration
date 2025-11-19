@@ -138,6 +138,7 @@
     <ClInclude Include="Requests.h" />
     <ClInclude Include="rover.h" />
     <ClInclude Include="StackADT.h" />
+    <ClInclude Include="UI.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="abortRequest.cpp" />
@@ -148,6 +149,8 @@
     <ClCompile Include="newRequest.cpp" />
     <ClCompile Include="priQueue.h" />
     <ClCompile Include="Requests.cpp" />
+    <ClCompile Include="rover.cpp" />
+    <ClCompile Include="UI.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

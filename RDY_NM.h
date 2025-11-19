@@ -27,6 +27,7 @@ public:
                     this->backPtr = previous;
 
                 delete current;
+                --this->count; // decrement count
                 return tobeAborted;
             }
             previous = current;
