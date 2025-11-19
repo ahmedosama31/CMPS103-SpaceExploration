@@ -128,7 +128,7 @@
     <ClInclude Include="LinkedQueue.h" />
     <ClInclude Include="MarsStation.h" />
     <ClInclude Include="mission.h" />
-    <ClInclude Include="MissionType.h" />
+    <ClInclude Include="Enums.h" />
     <ClInclude Include="newRequest.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="OUT_Missions.h" />
@@ -141,7 +141,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="abortRequest.cpp" />
+    <ClCompile Include="Enums.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Mission.cpp" />
     <ClCompile Include="MissionType.cpp" />
     <ClCompile Include="newRequest.cpp" />
     <ClCompile Include="priQueue.h" />

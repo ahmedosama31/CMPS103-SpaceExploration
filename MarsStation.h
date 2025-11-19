@@ -10,7 +10,7 @@ using namespace std;
 #include "Requests.h"
 #include "newRequest.h"
 #include "abortRequest.h"
-#include "MissionType.h"
+#include "Enums.h"
 
 class MarsStation {
 private:
@@ -21,8 +21,8 @@ private:
     LinkedQueue<Rover*> AvailablePolarRovers;
     LinkedQueue<Rover*> AvailableNormalRovers;
     LinkedQueue<Requests*> RequestsList;
-    LinkedQueue<mission*> ReadyDiggingMissions;
-    LinkedQueue<mission*> ReadyPolarMissions;
+    LinkedQueue<Mission*> ReadyDiggingMissions;
+    LinkedQueue<Mission*> ReadyPolarMissions;
     RDY_NM ReadyNormalMissions;
    
     
@@ -43,13 +43,13 @@ public:
         int id = 1;
         for (int i=0; i < D; i++)
             AvailableDiggingRovers.enqueue(
-                new Rover(id++, MissionType::Digging, SD, M, CD));
+                new Rover(id++, RoverType::Digging, SD, M, CD));
         for (int i=0; i < P; i++)
             AvailablePolarRovers.enqueue(
-                new Rover(id++, MissionType::Polar, SP, M, CP));
+                new Rover(id++, RoverType::Polar, SP, M, CP));
         for (int i=0; i < N; i++)
             AvailableNormalRovers.enqueue(
-                new Rover(id++, MissionType::Normal, SN, M, CN));
+                new Rover(id++, RoverType::Normal, SN, M, CN));
 
         int K;
         inputFile >> K;
@@ -60,7 +60,7 @@ public:
                 char MType;
                 int RDay, ID, TLOC, MDUR;
                 inputFile >> MType >> RDay >> ID >> TLOC >> MDUR;
-                RequestsList.enqueue(new newRequest(RDay, ID, CharToMType(MType), TLOC, MDUR));
+                RequestsList.enqueue(new newRequest(RDay, ID, CharToMissionType(MType), TLOC, MDUR));
             }
             else if (RType == 'X') {
                 int XDay, ID;
@@ -85,7 +85,7 @@ public:
             delete req;
         }
     }
-    void InsertMission(mission* M)
+    void InsertMission(Mission* M)
     {
         switch (M->getType()) {
         case MissionType::Digging:
