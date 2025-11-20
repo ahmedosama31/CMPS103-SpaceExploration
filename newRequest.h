@@ -19,7 +19,7 @@ public:
     void setMissionType(MissionType t) { MType = t; }
     void setTargetLocation(int loc) { TLOC = loc; }
     void setMissionDuration(int dur) { MDUR = dur; }
-
+    void print(std::ostream& os) const override;
     void Operate(MarsStation& marsStation) override;
 };
 

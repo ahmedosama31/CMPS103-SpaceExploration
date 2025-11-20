@@ -36,8 +36,14 @@ std::ostream& operator<<(std::ostream& os, const Mission& m)
 
     os << ", RDay: " << m.RequestedDay
         << ", TLOC: " << m.TargetLocation
-        << ", MDUR: " << m.MissionDuration
-        << "]";
+        << ", MDUR: " << m.MissionDuration;
+        if (m.getAssignedRover()) {
+            os << ", Rover: " << m.getAssignedRover()->getID();
+        }
+        else {
+            os << ", Rover: -";
+        }
+    os << "]";
 
     return os;
 }
@@ -49,5 +55,4 @@ std::ostream& operator<<(std::ostream& os, const Mission* m)
     else
         os << "[NULL Mission]";
     return os;
-}
 }

@@ -145,7 +145,6 @@
     <ClCompile Include="Enums.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mission.cpp" />
-    <ClCompile Include="MissionType.cpp" />
     <ClCompile Include="newRequest.cpp" />
     <ClCompile Include="priQueue.h" />
     <ClCompile Include="Requests.cpp" />

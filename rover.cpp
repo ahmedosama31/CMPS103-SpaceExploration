@@ -42,7 +42,6 @@ bool Rover::needsCheckup() const {
     return completedMissions >= missionsBeforeCheckup;
 }
 
-// ----- Output operator for Rover& -----
 ostream& operator<<(ostream& os, const Rover& r)
 {
     os << "[Rover ID: " << r.ID << ", Type: ";

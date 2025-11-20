@@ -13,6 +13,7 @@ using namespace std;
 #include "abortRequest.h"
 #include "Enums.h"
 #include "ArrayStack.h"
+#include "UI.h"
 
 class MarsStation {
 private:
@@ -98,6 +99,45 @@ public:
             delete req;
         }
     }
+
+    bool EnqueueAvailable(Rover* r)
+    {
+        if (!r)
+            return false;
+        switch (r->getType()) {
+        case RoverType::Digging:
+            AvailableDiggingRovers.enqueue(r);
+            break;
+        case RoverType::Polar:
+            AvailablePolarRovers.enqueue(r);
+            break;
+        case RoverType::Normal:
+            AvailableNormalRovers.enqueue(r);
+            break;
+        }
+        return true;
+    }
+    bool EnqueueCheckup(Rover* r)
+    {
+        if (!r)
+            return false;
+        switch (r->getType()) {
+        case RoverType::Digging:
+            CheckupDiggingRovers.enqueue(r);
+            break;
+        case RoverType::Polar:
+            CheckupPolarRovers.enqueue(r);
+            break;
+        case RoverType::Normal:
+            CheckupNormalRovers.enqueue(r);
+            break;
+        }
+        return true;
+    }
+
+
+
+
     void InsertMission(Mission* M)
     {
         switch (M->getType()) {
@@ -117,8 +157,154 @@ public:
 
     }
 
-    void Simulate();
+    void Simulate()
+    {
+        int currentDay = 1;
+        LoadFromFile("input.txt");
 
+        UI ui;
+        const int MAX_DAYS = 200;  
+
+        while (true)
+        {
+            // Stop when everything is empty 
+            // no requests no rdy and no out,exec,back
+          
+
+            if (RequestsList.getCount() == 0 && ReadyDiggingMissions.getCount() == 0 &&
+                ReadyPolarMissions.getCount() == 0 &&
+                ReadyNormalMissions.getCount() == 0 && OUTMissions.getCount() == 0 &&
+                EXECMissions.getCount() == 0 &&
+                BACKMissions.getCount() == 0)
+            {
+                ui.PrintDay(currentDay, this);
+                break;
+            }
+
+            ExecuteRequests(currentDay);
+
+            // 70% move one rover from checkup -> available
+
+            int Y = rand() % 100;
+            if (Y < 70)
+            {
+                Rover* R = nullptr;
+                if (CheckupNormalRovers.dequeue(R))
+                    EnqueueAvailable(R);
+                else if (CheckupDiggingRovers.dequeue(R))
+                    EnqueueAvailable(R);
+                else if (CheckupPolarRovers.dequeue(R))
+                    EnqueueAvailable(R);
+            }
+
+
+            // BACK -> DONE, return rover
+
+            Mission* m = nullptr;
+            if (BACKMissions.dequeue(m))
+            {
+                DONEMissions.push(m);
+
+                Rover* r = m->getAssignedRover();
+                if (r)
+                {
+                    int x = rand() % 100;
+                    if (x < 20) EnqueueCheckup(r);
+                    else        EnqueueAvailable(r);
+                }
+            }
+
+
+            // EXEC -> BACK (2 missions)
+
+            Mission* m1 = nullptr;
+            Mission* m2 = nullptr;
+
+            if (EXECMissions.dequeue(m1)) BACKMissions.enqueue(m1);
+            if (EXECMissions.dequeue(m2)) BACKMissions.enqueue(m2);
+
+
+            // OUT -> EXEC (1 mission)
+
+            Mission* outMission = nullptr;
+            int dummyPri = 0;
+            if (OUTMissions.dequeue(outMission, dummyPri))
+                EXECMissions.enqueue(outMission);
+
+
+            // RDY Polar -> OUT  (ONLY if any rover is available)
+
+            if (AvailablePolarRovers.getCount() > 0 ||
+                AvailableNormalRovers.getCount() > 0 ||
+                AvailableDiggingRovers.getCount() > 0)
+            {
+                Mission* PM = nullptr;
+                if (ReadyPolarMissions.dequeue(PM))
+                {
+                    Rover* r = nullptr;
+                    if (AvailablePolarRovers.dequeue(r) ||
+                        AvailableNormalRovers.dequeue(r) ||
+                        AvailableDiggingRovers.dequeue(r))
+                    {
+                        PM->assignRover(r);
+                        OUTMissions.enqueue(PM, 1);
+                    }
+                    else ReadyPolarMissions.enqueue(PM); // safety
+                }
+            }
+
+
+            // RDY Digging -> OUT
+
+            if (AvailableDiggingRovers.getCount() > 0 ||
+                AvailablePolarRovers.getCount() > 0 ||
+                AvailableNormalRovers.getCount() > 0)
+            {
+                Mission* DM = nullptr;
+                if (ReadyDiggingMissions.dequeue(DM))
+                {
+                    Rover* r = nullptr;
+                    if (AvailablePolarRovers.dequeue(r) ||
+                        AvailableNormalRovers.dequeue(r) ||
+                        AvailableDiggingRovers.dequeue(r))
+                    {
+                        DM->assignRover(r);
+                        OUTMissions.enqueue(DM, 1);
+                    }
+                    else ReadyDiggingMissions.enqueue(DM);
+                }
+            }
+
+            // RDY Normal -> OUT
+            if (AvailableNormalRovers.getCount() > 0 ||
+                AvailablePolarRovers.getCount() > 0 ||
+                AvailableDiggingRovers.getCount() > 0)
+            {
+                Mission* NM = nullptr;
+                if (ReadyNormalMissions.dequeue(NM))
+                {
+                    Rover* r = nullptr;
+                    if (AvailablePolarRovers.dequeue(r) ||
+                        AvailableNormalRovers.dequeue(r) ||
+                        AvailableDiggingRovers.dequeue(r))
+                    {
+                        NM->assignRover(r);
+                        OUTMissions.enqueue(NM, 1);
+                    }
+                    else ReadyNormalMissions.enqueue(NM);
+                }
+            }
+            // PRINT
+            ui.PrintDay(currentDay, this);
+
+            currentDay++;
+            if (currentDay > MAX_DAYS)
+            {
+                cerr << "Reached MAX_DAYS, stopping simulation (Phase1.2).\n";
+                break;
+            }
+        }
+    }
     // Getters for lists (for testing and UI)
     LinkedQueue<Rover*>& getCheckupDiggingRovers() { return CheckupDiggingRovers; }
     LinkedQueue<Rover*>& getCheckupPolarRovers() { return CheckupPolarRovers; }
@@ -136,10 +322,3 @@ public:
     LinkedQueue<Mission*>& getAbortedMissions() { return AbortedMissions; }
     ArrayStack<Mission*>& getDONEMissions() { return DONEMissions; }
 };
-
-
-
-
-
-
-

@@ -219,20 +219,22 @@ void testRoverPrinting() {
 
 int main()
 {
-    cout << "Data Structures Testing: "<< endl;
-    cout << endl;
+    //cout << "Data Structures Testing: "<< endl;
+    //cout << endl;
 
-    // Test all data structures
-    testLinkedQueue();
-    testPriQueue();
-    testArrayStack();
-    testRDY_NM();
-    testOUT_missions();
-    testRoverPrinting();
+    //// Test all data structures
+    //testLinkedQueue();
+    //testPriQueue();
+    //testArrayStack();
+    //testRDY_NM();
+    //testOUT_missions();
+    //testRoverPrinting();
 
-    cout << "====================================================" << endl;
-    cout << "   All tests done!" << endl;
-    cout << "====================================================" << endl;
-
+    //cout << "====================================================" << endl;
+    //cout << "   All tests done!" << endl;
+    //cout << "====================================================" << endl;
+    //
+    MarsStation ms;
+    ms.Simulate();
     return 0;
 }

@@ -7,3 +7,10 @@ void newRequest::Operate(MarsStation& marsStation) {
                              getRday());
     marsStation.InsertMission(M);
 }
+void newRequest::print(std::ostream& os) const
+{
+    os << "[R, "
+        << MissionTypeToChar(MType) << ", "
+        << RDay << ", M" << missionID
+        << "]";
+}
