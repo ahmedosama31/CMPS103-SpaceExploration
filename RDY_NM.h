@@ -1,20 +1,20 @@
 #pragma once
 #include "LinkedQueue.h"
-#include "mission.h"
+#include "Mission.h"
 
-class RDY_NM : public LinkedQueue<mission*>
+class RDY_NM : public LinkedQueue<Mission*>
 {
 public:
-	mission* Abortmission(int ID) 
+	Mission* Abortmission(int ID) 
 	{       
         if (this->isEmpty()) return nullptr;
 
-        Node<mission*>* previous = nullptr;
-        Node<mission*>* current = this->frontPtr;
+        Node<Mission*>* previous = nullptr;
+        Node<Mission*>* current = this->frontPtr;
 
         while (current != nullptr) {
             if (current->getItem()->getID() == ID) {
-                mission* tobeAborted = current->getItem();
+                Mission* tobeAborted = current->getItem();
 
                 // Remove node
                 if (current == this->frontPtr)
@@ -27,6 +27,7 @@ public:
                     this->backPtr = previous;
 
                 delete current;
+                --this->count; // decrement count
                 return tobeAborted;
             }
             previous = current;

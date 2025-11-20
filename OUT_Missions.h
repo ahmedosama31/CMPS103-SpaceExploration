@@ -1,30 +1,28 @@
 #pragma once
 #include "priQueue.h"
-#include "mission.h"
-class OUT_missions : public priQueue<mission*>
+#include "Mission.h"
+class OUT_missions : public priQueue<Mission*>
 {
 public:
-	mission* Abortmission(int ID) 
+	Mission* Abortmission(int ID) 
 	{
 		if (this->isEmpty()) 
 			return nullptr;
 
-
-		priNode<mission*>* previous = nullptr;
-		priNode<mission*>* current = this->head;
-
+		priNode<Mission*>* previous = nullptr;
+		priNode<Mission*>* current = this->head;
 
 		while (current) {
 			int pri;
-			mission* m = current->getItem(pri);
+			Mission* m = current->getItem(pri);
 			if (m->getID() == ID) {
 				if (current == this->head)
 					this->head = current->getNext();
 				else
 					previous->setNext(current->getNext());
 
-
 				delete current; // delete node only
+				--this->count; // decrement count
 				return m;
 			}
 			previous = current;

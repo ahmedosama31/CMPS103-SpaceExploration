@@ -47,12 +47,15 @@ class LinkedQueue : public QueueADT<T>
 protected:
     Node<T>* backPtr;
     Node<T>* frontPtr;
+    int count; 
 public:
     LinkedQueue();
     bool isEmpty() const;
     bool enqueue(const T& newEntry);
     bool dequeue(T& frntEntry);
     bool peek(T& frntEntry) const;
+    int getCount() const;          
+    void print() const; 
     ~LinkedQueue();
 };
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -68,7 +71,7 @@ LinkedQueue<T>::LinkedQueue()
 {
     backPtr = nullptr;
     frontPtr = nullptr;
-
+    count = 0; // init
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -105,6 +108,7 @@ bool LinkedQueue<T>::enqueue(const T& newEntry)
         backPtr->setNext(newNodePtr); // The queue was not empty
 
     backPtr = newNodePtr; // New node is the last node now
+    ++count; 
     return true;
 } // end enqueue
 
@@ -124,17 +128,13 @@ bool LinkedQueue<T>::dequeue(T& frntEntry)
 {
     if (isEmpty())
         return false;
-
     Node<T>* nodeToDeletePtr = frontPtr;
     frntEntry = frontPtr->getItem();
     frontPtr = frontPtr->getNext();
-    // Queue is not empty; remove front
-    if (nodeToDeletePtr == backPtr) // Special case: last node in the queue
+    if (nodeToDeletePtr == backPtr)
         backPtr = nullptr;
-
-    // Free memory reserved for the dequeued node
     delete nodeToDeletePtr;
-
+    --count; 
     return true;
 }
 
@@ -163,17 +163,35 @@ bool LinkedQueue<T>::peek(T& frntEntry) const
 ///////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
+int LinkedQueue<T>::getCount() const
+{
+    return count;
+}
+
+template <typename T>
+void LinkedQueue<T>::print() const
+{
+    //printing pointers
+    Node<T>* cur = frontPtr;
+    while (cur != nullptr) {
+        std::cout << *(cur->getItem()) << " ";
+        cur = cur->getNext();
+    }
+    std::cout << std::endl;
+}
+
+template <typename T>
 LinkedQueue<T>::~LinkedQueue()
 {
     // Note that the cout statements here is just for learning purpose
     // They should be normally removed from the destructor
-    cout << "\nStarting LinkedQueue destructor...";
-    cout << "\nFreeing all nodes in the queue...";
+    // cout << "\nStarting LinkedQueue destructor...";
+    // cout << "\nFreeing all nodes in the queue...";
 
     // Free all nodes in the queue
     T temp;
     while (dequeue(temp));
 
-    cout << "\n Is LinkedQueue Empty now?? ==> " << boolalpha << isEmpty();
-    cout << "\nEnding LinkedQueue destructor..." << endl;
+    // cout << "\n Is LinkedQueue Empty now?? ==> " << boolalpha << isEmpty();
+    // cout << "\nEnding LinkedQueue destructor..." << endl;
 }

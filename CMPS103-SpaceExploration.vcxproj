@@ -126,8 +126,9 @@
     <ClInclude Include="abortRequest.h" />
     <ClInclude Include="ArrayStack.h" />
     <ClInclude Include="LinkedQueue.h" />
+    <ClInclude Include="MarsStation.h" />
     <ClInclude Include="mission.h" />
-    <ClInclude Include="MissionType.h" />
+    <ClInclude Include="Enums.h" />
     <ClInclude Include="newRequest.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="OUT_Missions.h" />
@@ -137,14 +138,18 @@
     <ClInclude Include="Requests.h" />
     <ClInclude Include="rover.h" />
     <ClInclude Include="StackADT.h" />
+    <ClInclude Include="UI.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="abortRequest.cpp" />
+    <ClCompile Include="Enums.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MissionType.cpp" />
+    <ClCompile Include="Mission.cpp" />
     <ClCompile Include="newRequest.cpp" />
     <ClCompile Include="priQueue.h" />
     <ClCompile Include="Requests.cpp" />
+    <ClCompile Include="rover.cpp" />
+    <ClCompile Include="UI.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
