@@ -1,10 +1,9 @@
 #pragma once
+using namespace std;
 
 #include <iostream>
 #include <fstream>
-#include <cmath> // Added for ceil()
-using namespace std;
-
+#include <cmath>
 #include "LinkedQueue.h"
 #include "priQueue.h"              
 #include "RDY_NM.h"
@@ -141,19 +140,63 @@ public:
         // To be implemented by Member 3
     }
 
-    // Rover maintenance
-    void ReleaseRover(Rover* r)
+    // when rover completes mission, check if it needs checkup and if not move it to available
+    void ReleaseRover(Rover* r, int currentDay)
     {
-        // TODO: Member 2 Implement this
         if(r) {
             r->incrementCompletedMissions();
-            EnqueueAvailable(r);
+            
+            if (r->needsCheckup())
+            {
+                r->startCheckup(currentDay);
+                EnqueueCheckup(r);
+            }
+            else
+            {
+                EnqueueAvailable(r);
+            }
         }
     }
 
     void ManageCheckups(int currentDay)
     {
-        // TODO: Member 2/3 Implement this
+        Rover* r = nullptr;
+
+        // Digging
+        while (CheckupDiggingRovers.peek(r))
+        {
+            if (r->getAvailableDay() <= currentDay)
+            {
+                CheckupDiggingRovers.dequeue(r);
+                r->finishCheckup();
+                EnqueueAvailable(r);
+            }
+            else break;
+        }
+
+        // Polar
+        while (CheckupPolarRovers.peek(r))
+        {
+            if (r->getAvailableDay() <= currentDay)
+            {
+                CheckupPolarRovers.dequeue(r);
+                r->finishCheckup();
+                EnqueueAvailable(r);
+            }
+            else break;
+        }
+
+        // Normal
+        while (CheckupNormalRovers.peek(r))
+        {
+            if (r->getAvailableDay() <= currentDay)
+            {
+                CheckupNormalRovers.dequeue(r);
+                r->finishCheckup();
+                EnqueueAvailable(r);
+            }
+            else break;
+        }
     }
 
         // Mission assignment (RDY -> OUT)
@@ -304,7 +347,7 @@ public:
                 BACKMissions.dequeue(m, pri);
                 DONEMissions.push(m);
                 m->setCompletionDay(currentDay); 
-                ReleaseRover(m->getAssignedRover());
+                ReleaseRover(m->getAssignedRover(), currentDay);
             }
             else
                 break;
@@ -319,12 +362,16 @@ public:
         int mode;
         cout << "Select Mode (1: Interactive, 2: Silent): ";
         cin >> mode;
+        cin.ignore(); 
         
+        if (mode == 2) {
+            cout << "Silent Mode" << endl;
+        }
+        cout << "Simulation Starts..." << endl;
+
         // Initialize
         int currentDay = 1;
         LoadFromFile("input.txt"); 
-
-        cout << "Simulation Starts..." << endl;
 
         while (true)
         {
@@ -344,10 +391,7 @@ public:
             {
                 ui.PrintDay(currentDay, this);
                 cout << "Press Enter to continue...";
-                cin.ignore(); cin.get(); // Simple pause
-            }
-            else if (mode == 2) {
-                // Silent mode
+                cin.get(); 
             }
 
 
