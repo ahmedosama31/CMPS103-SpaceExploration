@@ -21,39 +21,33 @@ using namespace std;
 class MarsStation {
 private:
     // Rover Lists
-    LinkedQueue<Rover*> CheckupDiggingRovers;
-    LinkedQueue<Rover*> CheckupPolarRovers;
-    LinkedQueue<Rover*> CheckupNormalRovers;
+    LinkedQueue<Rover*> AvailableDiggingRovers; 
+    LinkedQueue<Rover*> AvailablePolarRovers;   
+    LinkedQueue<Rover*> AvailableNormalRovers;  
+    LinkedQueue<Rover*> CheckupDiggingRovers;   
+    LinkedQueue<Rover*> CheckupPolarRovers;     
+    LinkedQueue<Rover*> CheckupNormalRovers;    
     
-    LinkedQueue<Rover*> AvailableDiggingRovers;
-    LinkedQueue<Rover*> AvailablePolarRovers; 
-    LinkedQueue<Rover*> AvailableNormalRovers;
-    
-    // Requests List
+    // Mission Lists
+    LinkedQueue<Mission*> ReadyDiggingMissions; 
+    LinkedQueue<Mission*> ReadyPolarMissions;   
+    RDY_NM                ReadyNormalMissions;    
+    OUT_missions          OUTMissions;        
+    priQueue<Mission*>    EXECMissions;       
+    priQueue<Mission*>    BACKMissions;       
+    ArrayStack<Mission*>  DONEMissions;       
+    LinkedQueue<Mission*> AbortedMissions;    
+  
+    // Request List
     LinkedQueue<Requests*> RequestsList;
 
-    // Mission Lists
-    LinkedQueue<Mission*> ReadyDiggingMissions;
-    LinkedQueue<Mission*> ReadyPolarMissions;
-    RDY_NM               ReadyNormalMissions;
-    LinkedQueue<Mission*> AbortedMissions;
-  
-    priQueue<Mission*>   EXECMissions;
-    priQueue<Mission*>   BACKMissions;
-    OUT_missions         OUTMissions;
-
-    ArrayStack<Mission*>  DONEMissions;
-   
 public:
     // Simulation Parameters
-    int D = 0, P = 0, N = 0;
-    int SD = 0, SP = 0, SN = 0;
-    int M = 0;
-    int CD = 0, CP = 0, CN = 0;
+    int D = 0, P = 0, N = 0; 
+    int SD = 0, SP = 0, SN = 0; 
+    int M = 0; 
+    int CD = 0, CP = 0, CN = 0; 
 
-    // =============================================================
-    // File Loading (Phase 1.2 - Already Implemented)
-    // =============================================================
     void LoadFromFile(const string& filename)
     {
         std::ifstream inputFile(filename);
@@ -94,24 +88,8 @@ public:
         inputFile.close();
     }
 
-    // =============================================================
-    // Helper Functions
-    // =============================================================
 
-    // Helper: Execute events for the current day
-    void ExecuteRequests(int currentDay)
-    {
-        Requests* req = nullptr;
-        while (RequestsList.peek(req)) {
-            if (req->getRday() > currentDay)
-                return;
-            RequestsList.dequeue(req);
-            req->Operate(*this);
-            delete req;
-        }
-    }
-
-    // Helper: Move Rover to Available List
+    // Helper functions
     bool EnqueueAvailable(Rover* r)
     {
         if (!r) return false;
@@ -145,15 +123,123 @@ public:
         }
     }
 
-    // Placeholder: Abort Mission (Member 3)
+    // Request handling
+    void ExecuteRequests(int currentDay)
+    {
+        Requests* req = nullptr;
+        while (RequestsList.peek(req)) {
+            if (req->getRday() > currentDay)
+                return;
+            RequestsList.dequeue(req);
+            req->Operate(*this);
+            delete req;
+        }
+    }
+    
     void AbortMission(int missionID)
     {
         // To be implemented by Member 3
     }
 
-    // =============================================================
-    // MEMBER 1 TASKS: Mission Lifecycle Management
-    // =============================================================
+    // Rover maintenance
+    void ReleaseRover(Rover* r)
+    {
+        // TODO: Member 2 Implement this
+        if(r) {
+            r->incrementCompletedMissions();
+            EnqueueAvailable(r);
+        }
+    }
+
+    void ManageCheckups(int currentDay)
+    {
+        // TODO: Member 2/3 Implement this
+    }
+
+        // Mission assignment (RDY -> OUT)
+        void AssignMissions(int currentDay)
+        {
+            Mission* m = nullptr;
+            Rover* r = nullptr;
+    
+            // POLAR Missions
+            while (ReadyPolarMissions.peek(m))
+            {
+                r = nullptr;
+                if (AvailablePolarRovers.dequeue(r))
+                {
+                    r->assignMission(m); 
+                }
+                else if (AvailableNormalRovers.dequeue(r))
+                {
+                    r->assignMission(m); 
+                }
+                else if (AvailableDiggingRovers.dequeue(r))
+                {
+                    r->assignMission(m); 
+                }
+                
+                if (r != nullptr)
+                {
+                    ReadyPolarMissions.dequeue(m);
+                    double travelHours = (double)m->getTargetLocation() / r->getSpeed();
+                    int travelDays = ceil(travelHours / 25.0);
+                    int arrivalDay = currentDay + travelDays;
+                    OUTMissions.enqueue(m, -arrivalDay);
+                }
+                else
+                {
+                    break; 
+                }
+            }
+    
+            // DIGGING Missions
+            while (ReadyDiggingMissions.peek(m))
+            {
+                r = nullptr; 
+                if (AvailableDiggingRovers.dequeue(r))
+                {
+                    r->assignMission(m); 
+                    ReadyDiggingMissions.dequeue(m);
+                    double travelHours = (double)m->getTargetLocation() / r->getSpeed();
+                    int travelDays = ceil(travelHours / 25.0);
+                    int arrivalDay = currentDay + travelDays;
+                    OUTMissions.enqueue(m, -arrivalDay);
+                }
+                else
+                {
+                    break;
+                }
+            }
+    
+            // NORMAL Missions
+            while (ReadyNormalMissions.peek(m))
+            {
+                r = nullptr; 
+                if (AvailableNormalRovers.dequeue(r))
+                {
+                    r->assignMission(m); 
+                }
+                else if (AvailablePolarRovers.dequeue(r))
+                {
+                    r->assignMission(m); 
+                }
+    
+                if (r != nullptr)
+                {
+                    ReadyNormalMissions.dequeue(m);
+                    double travelHours = (double)m->getTargetLocation() / r->getSpeed();
+                    int travelDays = ceil(travelHours / 25.0);
+                    int arrivalDay = currentDay + travelDays;
+                    OUTMissions.enqueue(m, -arrivalDay);
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }  
+ 
     
     // Move missions from OUT -> EXEC
     void UpdateOUTMissions(int currentDay)
@@ -163,35 +249,18 @@ public:
 
         while (OUTMissions.peek(m, pri))
         {
-            
-            
             int arrivalDay = -pri;
-
-            
-            if (arrivalDay <= currentDay) //it arrived today or a day before
+            if (arrivalDay <= currentDay)
             {
-                
                 OUTMissions.dequeue(m, pri);
-
                 int executionDuration = m->getMissionDuration();
-
-                
-                // Fday = Today + Duration
                 int Fday = currentDay + executionDuration;
-                
-                
                 m->setExecutionDays(executionDuration); 
-
-                // Move to EXEC List
-                // exec-> back will move based on who finished exec first, so priority is Fday.
-                // earliest fday comes out first so pri is -fday.
                 EXECMissions.enqueue(m, -Fday);
             }
             else
-            {
-                // The mission at the front hasn't arrived yet.
                 break;
-            }
+
         }
     }
 
@@ -203,30 +272,21 @@ public:
 
         while (EXECMissions.peek(m, pri))
         {
-
             int Fday = -pri;
-
-
             if (Fday <= currentDay) 
             {
-
                 EXECMissions.dequeue(m, pri);
                 double speed = m->getAssignedRover()->getSpeed();
                 double targetloc = m->getTargetLocation();
                 
-                // Fixed: Distance / Speed = Time
                 double travelHours = targetloc / speed;
-                int travelDays = ceil(travelHours / 25.0); 
-
+                int travelDays =ceil(travelHours / 25.0); 
                 int returnDay = currentDay + travelDays;
 
                 BACKMissions.enqueue(m, -returnDay);
             }
             else
-            {
-                // The mission at the front hasn't arrived yet.
                 break;
-            }
         }
     }
 
@@ -243,45 +303,13 @@ public:
             {
                 BACKMissions.dequeue(m, pri);
                 DONEMissions.push(m);
-                // ------------------------- Rover should be set to available ------------------
+                m->setCompletionDay(currentDay); 
+                ReleaseRover(m->getAssignedRover());
             }
             else
-            {
                 break;
-            }
         }
-
-
     }
-
-    // =============================================================
-    // MEMBER 2 TASKS: Rover Logic & Assignment
-    // =============================================================
-
-    void AssignMissions(int currentDay)
-    {
-        // Placeholder for Member 2
-        // Logic: Move missions from RDY -> OUT by assigning available rovers
-    }
-
-    void ManageCheckups(int currentDay)
-    {
-        // Placeholder for Member 2/3
-        // Logic: Move rovers from Checkup -> Available when done
-    }
-    
-    // Called when a mission is DONE to decide rover fate
-    void ReleaseRover(Rover* r)
-    {
-        // Placeholder for Member 2
-        // Logic: Check missions count vs M. Move to Checkup or Available.
-        // For now, let's just put it back to available so simulation doesn't stall.
-        if(r) EnqueueAvailable(r); 
-    }
-
-    // =============================================================
-    // MAIN SIMULATION LOOP (Member 4 + Member 1 Interface logic)
-    // =============================================================
 
     void Simulate()
     {
@@ -300,31 +328,32 @@ public:
 
         while (true)
         {
-            // 1. Execute new requests (Phase 1)
+            
             ExecuteRequests(currentDay);
 
-            // 2. Assign Missions (RDY -> OUT) - Member 2
-            AssignMissions(currentDay);
+            ManageCheckups(currentDay);
 
-            // 3. Update Mission States (OUT->EXEC->BACK->DONE) - Member 1
+            AssignMissions(currentDay);
+            
             UpdateOUTMissions(currentDay);
             UpdateEXECMissions(currentDay);
             UpdateBACKMissions(currentDay);
 
-            // 4. Manage Rovers (Checkups) - Member 2/3
-            ManageCheckups(currentDay);
-
-            // 5. Output / Interface - Member 1
+            // Output / Interface 
             if (mode == 1)
             {
                 ui.PrintDay(currentDay, this);
                 cout << "Press Enter to continue...";
                 cin.ignore(); cin.get(); // Simple pause
             }
+            else if (mode == 2) {
+                // Silent mode
+            }
 
-            // 6. Termination Condition
-            // Break if all missions are DONE (and all other lists empty)
-            // Simple check for now:
+
+            //Termination Condition
+            //Break if all missions are DONE (and all other lists empty)
+            //Simple check for now:
             if (RequestsList.getCount() == 0 &&
                 ReadyDiggingMissions.getCount() == 0 &&
                 ReadyPolarMissions.getCount() == 0 &&
@@ -343,9 +372,6 @@ public:
         // GenerateOutputFile(); // Member 4
     }
 
-    // =============================================================
-    // Getters (Existing)
-    // =============================================================
     LinkedQueue<Rover*>& getCheckupDiggingRovers() { return CheckupDiggingRovers; }
     LinkedQueue<Rover*>& getCheckupPolarRovers()   { return CheckupPolarRovers; }
     LinkedQueue<Rover*>& getCheckupNormalRovers()  { return CheckupNormalRovers; }
