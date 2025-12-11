@@ -15,13 +15,14 @@ int Mission::getMissionDuration() const { return MissionDuration; }
 int Mission::getWaitingDays() const { return WaitingDays; }
 int Mission::getExecutionDays() const { return ExecutionDays; }
 int Mission::getCompletionDay() const { return CompletionDay; }
+bool Mission::isAborted() const { return Aborted; }
 Rover* Mission::getAssignedRover() const { return AssignedRover; }
 
 void Mission::setWaitingDays(int w) { WaitingDays = w; }
 void Mission::setExecutionDays(int e) { ExecutionDays = e; }
 void Mission::setCompletionDay(int c) { CompletionDay = c; }
 void Mission::assignRover(Rover* r) { AssignedRover = r; }
-
+void Mission::setAborted(bool a) { Aborted = a; }
 
 std::ostream& operator<<(std::ostream& os, const Mission& m)
 {
