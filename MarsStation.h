@@ -201,18 +201,24 @@ public:
     // Member 1 Task: Auto Abort Polar Missions
     void AutoAbortPolarMissions(int currentDay)
     {
+        LinkedQueue<Mission*> tempQueue;
         Mission* m = nullptr;
-        while (ReadyPolarMissions.peek(m))
+
+        while (ReadyPolarMissions.dequeue(m))
         {
-            if (currentDay - m->getRequestedDay() > 2 * m->getMissionDuration())
+            if ((currentDay - m->getRequestedDay()) > (2 * m->getMissionDuration()))
             {
-                ReadyPolarMissions.dequeue(m);
                 AbortedMissions.enqueue(m);
             }
-            else 
+            else
             {
-                break;
+                tempQueue.enqueue(m);
             }
+        }
+
+        while (tempQueue.dequeue(m))
+        {
+            ReadyPolarMissions.enqueue(m);
         }
     }
 
