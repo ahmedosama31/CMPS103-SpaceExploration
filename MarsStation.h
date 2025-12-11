@@ -165,8 +165,7 @@ public:
         // Digging
         while (CheckupDiggingRovers.peek(r))
         {
-            if (r->getAvailableDay() <= currentDay)
-            {
+            if (r->getAvailableDay() <= currentDay) {
                 CheckupDiggingRovers.dequeue(r);
                 r->finishCheckup();
                 EnqueueAvailable(r);
@@ -177,8 +176,7 @@ public:
         // Polar
         while (CheckupPolarRovers.peek(r))
         {
-            if (r->getAvailableDay() <= currentDay)
-            {
+            if (r->getAvailableDay() <= currentDay) {
                 CheckupPolarRovers.dequeue(r);
                 r->finishCheckup();
                 EnqueueAvailable(r);
@@ -189,8 +187,7 @@ public:
         // Normal
         while (CheckupNormalRovers.peek(r))
         {
-            if (r->getAvailableDay() <= currentDay)
-            {
+            if (r->getAvailableDay() <= currentDay) {
                 CheckupNormalRovers.dequeue(r);
                 r->finishCheckup();
                 EnqueueAvailable(r);
@@ -199,9 +196,31 @@ public:
         }
     }
 
-        // Mission assignment (RDY -> OUT)
-        void AssignMissions(int currentDay)
+        
+
+    // Member 1 Task: Auto Abort Polar Missions
+    void AutoAbortPolarMissions(int currentDay)
+    {
+        Mission* m = nullptr;
+        while (ReadyPolarMissions.peek(m))
         {
+            if (currentDay - m->getRequestedDay() > 2 * m->getMissionDuration())
+            {
+                ReadyPolarMissions.dequeue(m);
+                AbortedMissions.enqueue(m);
+            }
+            else 
+            {
+                break;
+            }
+        }
+    }
+
+        
+
+            // Mission assignment (RDY -> OUT)
+
+            void AssignMissions(int currentDay)        {
             Mission* m = nullptr;
             Rover* r = nullptr;
     
@@ -377,6 +396,8 @@ public:
         {
             
             ExecuteRequests(currentDay);
+            
+            AutoAbortPolarMissions(currentDay);
 
             ManageCheckups(currentDay);
 
