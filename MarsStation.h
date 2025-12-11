@@ -128,11 +128,55 @@ public:
         case MissionType::Normal:  ReadyNormalMissions.enqueue(M);  break;
         }
     }
+    bool AbortNormalMission(int missionID)
+    {
+        Mission* RDYAbortM = ReadyNormalMissions.Abortmission(missionID);
+        if (RDYAbortM) 
+        {
+            RDYAbortM->setAborted(true);
+            AbortedMissions.enqueue(RDYAbortM);
+            return true;
+        }
+     
+        Mission* OUTAbortM = OUTMissions.Abortmission(missionID);
+       if (OUTAbortM) 
+       {
+           OUTAbortM->setAborted(true);
+           BACKMissions.enqueue(OUTAbortM, 1);
+           return true;
+       }
+
+       return false;
+    }
 
     void AbortMission(int missionID)
     {
         // (Not implemented)
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     void Simulate()
     {
@@ -167,13 +211,18 @@ public:
                 else if (CheckupDiggingRovers.dequeue(R)) EnqueueAvailable(R);
                 else if (CheckupPolarRovers.dequeue(R))   EnqueueAvailable(R);
             }
-
-            // BACK -> DONE
+            // BACK -> DONE (handle aborted missions)
             Mission* backM = nullptr;
             int backPri = 0;
             if (BACKMissions.dequeue(backM, backPri))
             {
-                DONEMissions.push(backM);
+                if (backM->isAborted()) {
+                    AbortedMissions.enqueue(backM);
+                }
+                else {
+                    DONEMissions.push(backM);
+                }
+
                 Rover* r = backM->getAssignedRover();
                 if (r)
                 {
@@ -182,6 +231,7 @@ public:
                     else        EnqueueAvailable(r);
                 }
             }
+
 
             // EXEC -> BACK (up to 2 missions)
             Mission* m1 = nullptr;
