@@ -137,6 +137,12 @@ public:
         if (OUTAbortM)
         {
             OUTAbortM->setAborted(true);
+            // Retrieve and return assigned rover to available queue
+            Rover* assignedRover = OUTAbortM->getAssignedRover();
+            if (assignedRover) {
+                OUTAbortM->setAssignedRover(nullptr); // Unassign rover from mission
+                ReturnRoverToAvailable(assignedRover);
+            }
             BACKMissions.enqueue(OUTAbortM, 1);
             return true;
         }
