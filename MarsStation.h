@@ -372,7 +372,9 @@ public:
                 BACKMissions.dequeue(m, pri);
                 DONEMissions.push(m);
                 m->setCompletionDay(currentDay); 
-                ReleaseRover(m->getAssignedRover(), currentDay);
+                Rover* assignedRover = m->getAssignedRover();
+                if (assignedRover)
+                    ReleaseRover(assignedRover, currentDay);
             }
             else
                 break;
