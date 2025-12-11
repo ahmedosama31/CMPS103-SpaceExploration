@@ -344,7 +344,12 @@ public:
             if (Fday <= currentDay) 
             {
                 EXECMissions.dequeue(m, pri);
-                double speed = m->getAssignedRover()->getSpeed();
+                Rover* assignedRover = m->getAssignedRover();
+                if (!assignedRover) {
+                    // No assigned rover; skip this mission or handle error as appropriate
+                    continue;
+                }
+                double speed = assignedRover->getSpeed();
                 double targetloc = m->getTargetLocation();
                 
                 double travelHours = targetloc / speed;
