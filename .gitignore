@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 Data Structures and Algorithms.txt
 .vscode/settings.json
+/Project_Docs
+*.md
