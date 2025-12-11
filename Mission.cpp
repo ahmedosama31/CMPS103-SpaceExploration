@@ -21,6 +21,7 @@ void Mission::setWaitingDays(int w) { WaitingDays = w; }
 void Mission::setExecutionDays(int e) { ExecutionDays = e; }
 void Mission::setCompletionDay(int c) { CompletionDay = c; }
 void Mission::assignRover(Rover* r) { AssignedRover = r; }
+void Mission::setAborted(bool a) { Aborted = a; }
 
 
 std::ostream& operator<<(std::ostream& os, const Mission& m)

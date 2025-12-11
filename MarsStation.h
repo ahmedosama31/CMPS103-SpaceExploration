@@ -122,6 +122,27 @@ public:
         }
     }
 
+    bool AbortNormalMission(int missionID)
+    {
+        Mission* RDYAbortM = ReadyNormalMissions.Abortmission(missionID);
+        if (RDYAbortM)
+        {
+            RDYAbortM->setAborted(true);
+            AbortedMissions.enqueue(RDYAbortM);
+            return true;
+        }
+
+        Mission* OUTAbortM = OUTMissions.Abortmission(missionID);
+        if (OUTAbortM)
+        {
+            OUTAbortM->setAborted(true);
+            BACKMissions.enqueue(OUTAbortM, 1);
+            return true;
+        }
+
+        return false;
+    }
+
     // Request handling
     void ExecuteRequests(int currentDay)
     {
@@ -137,7 +158,8 @@ public:
     
     void AbortMission(int missionID)
     {
-        // To be implemented by Member 3
+        // Use the helper logic
+        AbortNormalMission(missionID);
     }
 
     // when rover completes mission, check if it needs checkup and if not move it to available
@@ -196,9 +218,6 @@ public:
         }
     }
 
-        
-
-    // Member 1 Task: Auto Abort Polar Missions
     void AutoAbortPolarMissions(int currentDay)
     {
         LinkedQueue<Mission*> tempQueue;
@@ -222,91 +241,89 @@ public:
         }
     }
 
-        
+    // Mission assignment (RDY -> OUT)
+    void AssignMissions(int currentDay)        
+    {
+        Mission* m = nullptr;
+        Rover* r = nullptr;
 
-            // Mission assignment (RDY -> OUT)
+        // POLAR Missions
+        while (ReadyPolarMissions.peek(m))
+        {
+            r = nullptr;
+            if (AvailablePolarRovers.dequeue(r))
+            {
+                r->assignMission(m); 
+            }
+            else if (AvailableNormalRovers.dequeue(r))
+            {
+                r->assignMission(m); 
+            }
+            else if (AvailableDiggingRovers.dequeue(r))
+            {
+                r->assignMission(m); 
+            }
+            
+            if (r != nullptr)
+            {
+                ReadyPolarMissions.dequeue(m);
+                double travelHours = (double)m->getTargetLocation() / r->getSpeed();
+                int travelDays = ceil(travelHours / 25.0);
+                int arrivalDay = currentDay + travelDays;
+                OUTMissions.enqueue(m, -arrivalDay);
+            }
+            else
+            {
+                break; 
+            }
+        }
 
-            void AssignMissions(int currentDay)        {
-            Mission* m = nullptr;
-            Rover* r = nullptr;
-    
-            // POLAR Missions
-            while (ReadyPolarMissions.peek(m))
+        // DIGGING Missions
+        while (ReadyDiggingMissions.peek(m))
+        {
+            r = nullptr; 
+            if (AvailableDiggingRovers.dequeue(r))
             {
-                r = nullptr;
-                if (AvailablePolarRovers.dequeue(r))
-                {
-                    r->assignMission(m); 
-                }
-                else if (AvailableNormalRovers.dequeue(r))
-                {
-                    r->assignMission(m); 
-                }
-                else if (AvailableDiggingRovers.dequeue(r))
-                {
-                    r->assignMission(m); 
-                }
-                
-                if (r != nullptr)
-                {
-                    ReadyPolarMissions.dequeue(m);
-                    double travelHours = (double)m->getTargetLocation() / r->getSpeed();
-                    int travelDays = ceil(travelHours / 25.0);
-                    int arrivalDay = currentDay + travelDays;
-                    OUTMissions.enqueue(m, -arrivalDay);
-                }
-                else
-                {
-                    break; 
-                }
+                r->assignMission(m); 
+                ReadyDiggingMissions.dequeue(m);
+                double travelHours = (double)m->getTargetLocation() / r->getSpeed();
+                int travelDays = ceil(travelHours / 25.0);
+                int arrivalDay = currentDay + travelDays;
+                OUTMissions.enqueue(m, -arrivalDay);
             }
-    
-            // DIGGING Missions
-            while (ReadyDiggingMissions.peek(m))
+            else
             {
-                r = nullptr; 
-                if (AvailableDiggingRovers.dequeue(r))
-                {
-                    r->assignMission(m); 
-                    ReadyDiggingMissions.dequeue(m);
-                    double travelHours = (double)m->getTargetLocation() / r->getSpeed();
-                    int travelDays = ceil(travelHours / 25.0);
-                    int arrivalDay = currentDay + travelDays;
-                    OUTMissions.enqueue(m, -arrivalDay);
-                }
-                else
-                {
-                    break;
-                }
+                break;
             }
-    
-            // NORMAL Missions
-            while (ReadyNormalMissions.peek(m))
+        }
+
+        // NORMAL Missions
+        while (ReadyNormalMissions.peek(m))
+        {
+            r = nullptr; 
+            if (AvailableNormalRovers.dequeue(r))
             {
-                r = nullptr; 
-                if (AvailableNormalRovers.dequeue(r))
-                {
-                    r->assignMission(m); 
-                }
-                else if (AvailablePolarRovers.dequeue(r))
-                {
-                    r->assignMission(m); 
-                }
-    
-                if (r != nullptr)
-                {
-                    ReadyNormalMissions.dequeue(m);
-                    double travelHours = (double)m->getTargetLocation() / r->getSpeed();
-                    int travelDays = ceil(travelHours / 25.0);
-                    int arrivalDay = currentDay + travelDays;
-                    OUTMissions.enqueue(m, -arrivalDay);
-                }
-                else
-                {
-                    break;
-                }
+                r->assignMission(m); 
             }
-        }  
+            else if (AvailablePolarRovers.dequeue(r))
+            {
+                r->assignMission(m); 
+            }
+
+            if (r != nullptr)
+            {
+                ReadyNormalMissions.dequeue(m);
+                double travelHours = (double)m->getTargetLocation() / r->getSpeed();
+                int travelDays = ceil(travelHours / 25.0);
+                int arrivalDay = currentDay + travelDays;
+                OUTMissions.enqueue(m, -arrivalDay);
+            }
+            else
+            {
+                break;
+            }
+        }
+    }  
  
     
     // Move missions from OUT -> EXEC
@@ -344,7 +361,11 @@ public:
             if (Fday <= currentDay) 
             {
                 EXECMissions.dequeue(m, pri);
-                double speed = m->getAssignedRover()->getSpeed();
+                Rover* assignedRover = m->getAssignedRover();
+                if (!assignedRover) {
+                    continue;
+                }
+                double speed = assignedRover->getSpeed();
                 double targetloc = m->getTargetLocation();
                 
                 double travelHours = targetloc / speed;
@@ -372,7 +393,9 @@ public:
                 BACKMissions.dequeue(m, pri);
                 DONEMissions.push(m);
                 m->setCompletionDay(currentDay); 
-                ReleaseRover(m->getAssignedRover(), currentDay);
+                Rover* assignedRover = m->getAssignedRover();
+                if (assignedRover)
+                    ReleaseRover(assignedRover, currentDay);
             }
             else
                 break;
