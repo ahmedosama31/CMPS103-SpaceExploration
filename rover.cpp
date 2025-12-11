@@ -1,4 +1,5 @@
 #include "Rover.h"
+#include "mission.h"
 
 Rover::Rover(int id, RoverType t, double spd, int missionsBC, int checkDur)
     : ID(id), type(t), speed(spd), missionsBeforeCheckup(missionsBC),
@@ -23,8 +24,14 @@ void Rover::setAvailableDay(int day) { availableDay = day; }
 void Rover::setInCheckup(bool state) { inCheckup = state; }
 
 
-void Rover::assignMission(double distance) {
-    totalDistance += distance;
+void Rover::assignMission(Mission* mission) {
+    if (mission) {
+        totalDistance += mission->getTargetLocation();
+        mission->assignRover(this);
+    }
+}
+
+void Rover::incrementCompletedMissions() {
     completedMissions++;
 }
 

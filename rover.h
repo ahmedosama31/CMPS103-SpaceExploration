@@ -3,6 +3,8 @@
 #include "Enums.h"
 using namespace std;
 
+class Mission; // Forward declaration
+
 class Rover {
 private:
     int ID;
@@ -36,7 +38,8 @@ public:
     void setInCheckup(bool state);
 
     // Operations
-    void assignMission(double distance);
+    void assignMission(Mission* mission);
+    void incrementCompletedMissions();
     void startCheckup(int currentDay);
     void finishCheckup();
     bool needsCheckup() const;

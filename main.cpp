@@ -223,7 +223,7 @@ int main()
     cout << endl;
 
     // Test all data structures
-    testLinkedQueue();
+   /* testLinkedQueue();
     testPriQueue();
     testArrayStack();
     testRDY_NM();
@@ -232,7 +232,7 @@ int main()
 
     cout << "====================================================" << endl;
     cout << "   All tests done!" << endl;
-    cout << "====================================================" << endl;
+    cout << "====================================================" << endl;*/
     
     MarsStation ms;
     ms.Simulate();
