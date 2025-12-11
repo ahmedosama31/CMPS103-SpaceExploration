@@ -3,9 +3,9 @@
 
 Mission::Mission(int id, MissionType type, int targetlocation,
                  int missionduration, int requestday)
-    : ID(id), Type(type), TargetLocation(targetlocation),
+    : ID(id), Type(type), TargetLocation(targetlocation), Aborted(false),
       MissionDuration(missionduration), RequestedDay(requestday),
-      WaitingDays(0), ExecutionDays(0), CompletionDay(0), Aborted(false), AssignedRover(nullptr) {}
+      WaitingDays(0), ExecutionDays(0), CompletionDay(0), AssignedRover(nullptr) {}
 
 int Mission::getID() const { return ID; }
 MissionType Mission::getType() const { return Type; }
