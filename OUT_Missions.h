@@ -11,7 +11,6 @@ public:
 
 		priNode<Mission*>* previous = nullptr;
 		priNode<Mission*>* current = this->head;
-
 		while (current) {
 			int pri;
 			Mission* m = current->getItem(pri);
