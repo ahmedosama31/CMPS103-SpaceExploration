@@ -122,12 +122,13 @@ public:
         }
     }
 
+    // Helper to abort normal mission
     bool AbortNormalMission(int missionID)
     {
         Mission* RDYAbortM = ReadyNormalMissions.Abortmission(missionID);
         if (RDYAbortM) 
         {
-            RDYAbortM->setAborted(true); 
+            RDYAbortM->setAborted(true);
             AbortedMissions.enqueue(RDYAbortM);
             return true;
         }
@@ -136,11 +137,7 @@ public:
         if (OUTAbortM) 
         {
            OUTAbortM->setAborted(true);
-           // Rover recall logic cannot be fully implemented without currentDay parameter here.
-           // For now, mission is aborted and moved to AbortedMissions.
-           // The assigned rover will return to base with the mission. 
-           // ReleaseRover will eventually process it.
-           // BACKMissions.enqueue(OUTAbortM, 1); // No, move directly to aborted if we can't calculate return.
+           // Mission aborted while in OUT list; move directly to Aborted list.
            AbortedMissions.enqueue(OUTAbortM);
            return true;
         }
@@ -163,11 +160,10 @@ public:
     
     void AbortMission(int missionID)
     {
-        // Use the helper logic
         AbortNormalMission(missionID);
     }
 
-    // when rover completes mission, check if it needs checkup and if not move it to available
+    // Rover maintenance: Check if rover needs checkup after mission completion
     void ReleaseRover(Rover* r, int currentDay)
     {
         if(r) {
@@ -223,7 +219,7 @@ public:
         }
     }
 
-
+    // Auto Abort Polar Missions waiting too long
     void AutoAbortPolarMissions(int currentDay)
     {
         LinkedQueue<Mission*> tempQueue;
