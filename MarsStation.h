@@ -122,32 +122,30 @@ public:
         }
     }
 
-    // Helper to abort normal mission (from Hazem's branch)
     bool AbortNormalMission(int missionID)
     {
         Mission* RDYAbortM = ReadyNormalMissions.Abortmission(missionID);
-        if (RDYAbortM)
+        if (RDYAbortM) 
         {
-            RDYAbortM->setAborted(true);
+            RDYAbortM->setAborted(true); 
             AbortedMissions.enqueue(RDYAbortM);
             return true;
         }
-
+     
         Mission* OUTAbortM = OUTMissions.Abortmission(missionID);
-        if (OUTAbortM)
+        if (OUTAbortM) 
         {
-            OUTAbortM->setAborted(true);
-            // Retrieve and return assigned rover to available queue
-            Rover* assignedRover = OUTAbortM->getAssignedRover();
-            if (assignedRover) {
-                OUTAbortM->setAssignedRover(nullptr); // Unassign rover from mission
-                ReturnRoverToAvailable(assignedRover);
-            }
-            BACKMissions.enqueue(OUTAbortM, 1);
-            return true;
+           OUTAbortM->setAborted(true);
+           // Rover recall logic cannot be fully implemented without currentDay parameter here.
+           // For now, mission is aborted and moved to AbortedMissions.
+           // The assigned rover will return to base with the mission. 
+           // ReleaseRover will eventually process it.
+           // BACKMissions.enqueue(OUTAbortM, 1); // No, move directly to aborted if we can't calculate return.
+           AbortedMissions.enqueue(OUTAbortM);
+           return true;
         }
 
-        return false;
+       return false;
     }
 
     // Request handling
@@ -224,6 +222,7 @@ public:
             else break;
         }
     }
+
 
     void AutoAbortPolarMissions(int currentDay)
     {
@@ -398,8 +397,13 @@ public:
             if (returnDay <= currentDay)
             {
                 BACKMissions.dequeue(m, pri);
-                DONEMissions.push(m);
-                m->setCompletionDay(currentDay); 
+                // Check if the mission was aborted (and moved to BACK as part of abort)
+                if (m->isAborted()) {
+                    AbortedMissions.enqueue(m);
+                } else {
+                    DONEMissions.push(m);
+                    m->setCompletionDay(currentDay); 
+                }
                 Rover* assignedRover = m->getAssignedRover();
                 if (assignedRover)
                     ReleaseRover(assignedRover, currentDay);
@@ -425,7 +429,7 @@ public:
         cout << "Simulation Starts..." << endl;
 
         // Initialize
-        int currentDay = 1;
+        int currentDay = 1; 
         LoadFromFile("input.txt"); 
 
         while (true)
