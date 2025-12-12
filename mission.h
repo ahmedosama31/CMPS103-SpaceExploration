@@ -12,6 +12,7 @@ private:
     int RequestedDay;
     int WaitingDays;
     int ExecutionDays;
+    int LaunchDay;
     bool Aborted;
     int CompletionDay;
     Rover* AssignedRover;
@@ -27,6 +28,7 @@ public:
     int getMissionDuration() const;
     int getWaitingDays() const;
     int getExecutionDays() const;
+    int getLaunchDay() const;
     int getCompletionDay() const;
     bool isAborted() const;
     Rover* getAssignedRover() const;
@@ -34,6 +36,7 @@ public:
     // Setters
     void setWaitingDays(int w);
     void setExecutionDays(int e);
+    void setLaunchDay(int l);
     void setCompletionDay(int c);
     void assignRover(Rover* r);
     void setAborted(bool a);

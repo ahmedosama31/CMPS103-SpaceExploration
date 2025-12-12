@@ -3,7 +3,7 @@
 
 void abortRequest::Operate(MarsStation& marsStation)
 {
-    marsStation.AbortMission(getMissionID());
+    marsStation.AbortMission(getMissionID(), RDay);
 }
 void abortRequest::print(std::ostream& os) const
 {

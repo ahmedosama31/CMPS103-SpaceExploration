@@ -5,6 +5,9 @@
 #include "newRequest.h"
 #include "abortRequest.h"
 #include "UI.h"
+#include "mission.h"
+
+
 
 using namespace std;
 
@@ -79,7 +82,7 @@ void MarsStation::InsertMission(Mission* M)
     }
 }
 
-bool MarsStation::AbortMission(int missionID)
+bool MarsStation::AbortMission(int missionID, int currentDay)
 {
     Mission* RDYAbortM = ReadyNormalMissions.Abortmission(missionID);
     if (RDYAbortM) 
@@ -93,8 +96,11 @@ bool MarsStation::AbortMission(int missionID)
     if (OUTAbortM) 
     {
         OUTAbortM->setAborted(true);
-        // Mission aborted while in OUT list; move directly to Aborted list.
-        AbortedMissions.enqueue(OUTAbortM);
+        // Mission aborted while in OUT list
+        // Rover should start the back journey immediately.
+        int traveledDays = currentDay - OUTAbortM->getLaunchDay();
+        int returnDay = currentDay + traveledDays;
+        BACKMissions.enqueue(OUTAbortM, -returnDay);
         return true;
     }
 
@@ -216,6 +222,8 @@ void MarsStation::AssignMissions(int currentDay)
         if (r != nullptr)
         {
             ReadyPolarMissions.dequeue(m);
+            m->setLaunchDay(currentDay);
+            m->setWaitingDays(currentDay - m->getRequestedDay());
             double travelHours = (double)m->getTargetLocation() / r->getSpeed();
             int travelDays = ceil(travelHours / 25.0);
             int arrivalDay = currentDay + travelDays;
@@ -235,6 +243,8 @@ void MarsStation::AssignMissions(int currentDay)
         {
             r->assignMission(m); 
             ReadyDiggingMissions.dequeue(m);
+            m->setLaunchDay(currentDay);
+            m->setWaitingDays(currentDay - m->getRequestedDay());
             double travelHours = (double)m->getTargetLocation() / r->getSpeed();
             int travelDays = ceil(travelHours / 25.0);
             int arrivalDay = currentDay + travelDays;
@@ -262,6 +272,8 @@ void MarsStation::AssignMissions(int currentDay)
         if (r != nullptr)
         {
             ReadyNormalMissions.dequeue(m);
+            m->setLaunchDay(currentDay);
+            m->setWaitingDays(currentDay - m->getRequestedDay());
             double travelHours = (double)m->getTargetLocation() / r->getSpeed();
             int travelDays = ceil(travelHours / 25.0);
             int arrivalDay = currentDay + travelDays;

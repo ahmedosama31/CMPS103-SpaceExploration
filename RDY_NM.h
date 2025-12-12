@@ -1,6 +1,6 @@
 #pragma once
 #include "LinkedQueue.h"
-#include "Mission.h"
+#include "mission.h"
 
 class RDY_NM : public LinkedQueue<Mission*>
 {

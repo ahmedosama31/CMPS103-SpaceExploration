@@ -361,10 +361,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-Data Structures and Algorithms.txt
+
 .vscode/settings.json
-Project Docs/Phase2 - Project features weights - F25 - weights.csv
- 
-/Project_Docs
 *.md
 /input.txt
+/Project_Docs
+/Simulation.exe

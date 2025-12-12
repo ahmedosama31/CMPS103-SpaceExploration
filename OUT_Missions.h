@@ -1,6 +1,6 @@
 #pragma once
 #include "priQueue.h"
-#include "Mission.h"
+#include "mission.h"
 class OUT_missions : public priQueue<Mission*>
 {
 public:

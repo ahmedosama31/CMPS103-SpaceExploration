@@ -51,23 +51,7 @@ bool Rover::needsCheckup() const {
 
 ostream& operator<<(ostream& os, const Rover& r)
 {
-    os << "[Rover ID: " << r.ID << ", Type: ";
-
-    if (r.type == RoverType::Digging)
-        os << "D";
-    else if (r.type == RoverType::Polar)
-        os << "P";
-    else
-        os << "N";
-
-    os << ", Speed: " << r.speed << " km/h"
-        << ", Missions Before Checkup: " << r.missionsBeforeCheckup
-        << ", Completed Missions: " << r.completedMissions
-        << ", Total Distance: " << r.totalDistance << " km"
-        << ", In Checkup: " << (r.inCheckup ? "Yes" : "No")
-        << ", Available Day: " << r.availableDay
-        << "]";
-
+    os << r.ID;
     return os;
 }
 

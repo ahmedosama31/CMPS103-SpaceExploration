@@ -40,7 +40,7 @@ Single Node Case:
 
 #include "Node.h"
 #include "QueueADT.h"
-
+#include <iostream>
 template <typename T>
 class LinkedQueue : public QueueADT<T>
 {
@@ -55,7 +55,7 @@ public:
     bool dequeue(T& frntEntry);
     bool peek(T& frntEntry) const;
     int getCount() const;          
-    void print() const; 
+    void print(int limit = -1) const; 
     ~LinkedQueue();
 };
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -169,15 +169,22 @@ int LinkedQueue<T>::getCount() const
 }
 
 template <typename T>
-void LinkedQueue<T>::print() const
+void LinkedQueue<T>::print(int limit) const
 {
-    //printing pointers
     Node<T>* cur = frontPtr;
+    int c = 0;
     while (cur != nullptr) {
-        std::cout << *(cur->getItem()) << " ";
+        if (limit != -1 && c >= limit) break;
+        std::cout << *(cur->getItem());
+        
+        // Print comma only if there is a next item AND we haven't reached the limit
+        if (cur->getNext() && (limit == -1 || c < limit - 1)) {
+            std::cout << ", ";
+        }
+        
         cur = cur->getNext();
+        c++;
     }
-    std::cout << std::endl;
 }
 
 template <typename T>

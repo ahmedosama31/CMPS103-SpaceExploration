@@ -62,10 +62,11 @@ public:
 
     void print() const
     {
-        std::cout << "Stack (top to bottom): ";
+        std::cout << "[";
         for (int i = top; i >= 0; i--) {
-            std::cout << *items[i] << " ";
+            std::cout << *items[i];
+            if (i > 0) std::cout << ", ";
         }
-        std::cout << std::endl;
+        std::cout << "]";
     }
 };

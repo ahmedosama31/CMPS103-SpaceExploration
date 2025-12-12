@@ -45,7 +45,7 @@ public:
     bool EnqueueAvailable(Rover* r);
     bool EnqueueCheckup(Rover* r);
     void InsertMission(Mission* M);
-    bool AbortMission(int missionID);
+    bool AbortMission(int missionID, int currentDay);
 
     // Request handling
     void ExecuteRequests(int currentDay);

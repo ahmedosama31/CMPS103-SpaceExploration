@@ -5,7 +5,7 @@
 #include "ArrayStack.h"
 #include "RDY_NM.h"
 #include "OUT_Missions.h"
-#include "Mission.h"
+#include "mission.h"
 #include "rover.h"
 #include "Enums.h"
 using namespace std;

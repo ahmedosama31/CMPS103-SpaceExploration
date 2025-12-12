@@ -67,20 +67,30 @@ public:
 
     int getCount() const;  
 
-    void print() const;      
+    void print(int currentDay = -1) const;      
 };
 
 template <typename T>
 int priQueue<T>::getCount() const { return count; }
 
 template <typename T>
-void priQueue<T>::print() const {
+void priQueue<T>::print(int currentDay) const {
     priNode<T>* cur = head;
     while (cur) {
         int p;
         T item = cur->getItem(p);
-        std::cout << *item << " (pri=" << p << ") ";
+        
+        if (currentDay != -1) {
+             // Priority is negative of the target day (Arrival, Finish, or Return)
+             int targetDay = -p;
+             int daysLeft = targetDay - currentDay;
+             if (daysLeft < 0) daysLeft = 0; 
+             std::cout << "[" << *item << ", " << daysLeft << "days]";
+        } else {
+             std::cout << "[" << *item << "]";
+        }
+
+        if (cur->getNext()) std::cout << ", ";
         cur = cur->getNext();
     }
-    std::cout << std::endl;
 }
