@@ -40,6 +40,9 @@ public:
     int M = 0; 
     int CD = 0, CP = 0, CN = 0; 
 
+    
+    ~MarsStation();
+
     void LoadFromFile(const std::string& filename);
 
     // Helper functions

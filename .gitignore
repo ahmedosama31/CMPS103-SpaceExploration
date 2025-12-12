@@ -367,3 +367,5 @@ FodyWeavers.xsd
 /input.txt
 /Project_Docs
 /Simulation.exe
+*.o
+output.txt

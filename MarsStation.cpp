@@ -540,6 +540,46 @@ void MarsStation::Simulate()
     GenerateOutputFile();
 }
 
+
+MarsStation::~MarsStation()
+{
+    
+    Rover* r = nullptr;
+    
+    while (AvailableDiggingRovers.dequeue(r)) { delete r; }
+    while (AvailablePolarRovers.dequeue(r))   { delete r; }
+    while (AvailableNormalRovers.dequeue(r))  { delete r; }
+    while (CheckupDiggingRovers.dequeue(r))   { delete r; }
+    while (CheckupPolarRovers.dequeue(r))     { delete r; }
+    while (CheckupNormalRovers.dequeue(r))    { delete r; }
+    
+    // === DELETE ALL MISSIONS ===
+    // Missions can be in Ready, OUT, EXEC, BACK, DONE, or Aborted lists
+    Mission* m = nullptr;
+    int pri = 0;
+    
+    // Ready lists (LinkedQueue and derived)
+    while (ReadyDiggingMissions.dequeue(m)) { delete m; }
+    while (ReadyPolarMissions.dequeue(m))   { delete m; }
+    while (ReadyNormalMissions.dequeue(m))  { delete m; }
+    
+    // Priority queue lists (OUT, EXEC, BACK)
+    while (OUTMissions.dequeue(m, pri))  { delete m; }
+    while (EXECMissions.dequeue(m, pri)) { delete m; }
+    while (BACKMissions.dequeue(m, pri)) { delete m; }
+    
+    // Stack (DONE)
+    while (DONEMissions.pop(m)) { delete m; }
+    
+    // Aborted missions
+    while (AbortedMissions.dequeue(m)) { delete m; }
+    
+    // === DELETE ANY REMAINING REQUESTS ===
+    // (Should normally be empty after simulation, but clean up just in case)
+    Requests* req = nullptr;
+    while (RequestsList.dequeue(req)) { delete req; }
+}
+
 LinkedQueue<Rover*>& MarsStation::getCheckupDiggingRovers() { return CheckupDiggingRovers; }
 LinkedQueue<Rover*>& MarsStation::getCheckupPolarRovers()   { return CheckupPolarRovers; }
 LinkedQueue<Rover*>& MarsStation::getCheckupNormalRovers()  { return CheckupNormalRovers; }
