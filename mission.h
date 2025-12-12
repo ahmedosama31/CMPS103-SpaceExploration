@@ -31,6 +31,7 @@ public:
     int getExecutionDays() const;
     int getLaunchDay() const;
     int getCompletionDay() const;
+    int getTurnaroundDays() const;
     bool isAborted() const;
     bool isFailed() const;
     Rover* getAssignedRover() const;
