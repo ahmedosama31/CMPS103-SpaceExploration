@@ -16,6 +16,7 @@ int Mission::getWaitingDays() const { return WaitingDays; }
 int Mission::getExecutionDays() const { return ExecutionDays; }
 int Mission::getLaunchDay() const { return LaunchDay; }
 int Mission::getCompletionDay() const { return CompletionDay; }
+int Mission::getTurnaroundDays() const { return CompletionDay - LaunchDay; }
 bool Mission::isAborted() const { return Aborted; }
 Rover* Mission::getAssignedRover() const { return AssignedRover; }
 

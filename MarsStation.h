@@ -8,6 +8,7 @@
 #include "mission.h"    
 #include "Requests.h"
 #include "ArrayStack.h"
+#include <fstream>
 
 class MarsStation {
 private:
@@ -66,6 +67,7 @@ public:
     void UpdateBACKMissions(int currentDay);
 
     void Simulate();
+    void GenerateOutputFile();
 
     // Getters
     LinkedQueue<Rover*>& getCheckupDiggingRovers();

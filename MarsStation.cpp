@@ -365,11 +365,98 @@ void MarsStation::UpdateBACKMissions(int currentDay)
     }
 }
 
+// Output File Generation
+void MarsStation::GenerateOutputFile()
+{
+    ofstream outputFile("output.txt");
+    if (!outputFile.is_open()) {
+        cout << "Error: Cannot open output file." << endl;
+        return;
+    }
+    // Header
+    outputFile << "Simulation Output File\n" << endl;
+    outputFile << "----------------------\n" << endl;
+    outputFile << "Fday  ID  Rday  Wdays  Mdur   Tdays\n";
+    
+    long Total_Wdays = 0;
+	long Total_Tdays = 0;
+	long Total_Mdur = 0;
+    
+    int polarDoneCount = 0;
+    int polarAbortedCount = 0;
+
+    // Preserve DONEMissions while iterating for output
+    ArrayStack<Mission*> tempDONEMissions;
+    Mission* m;
+    int MissionDoneCount = 0;
+    
+    while (!DONEMissions.isEmpty()) {
+		DONEMissions.pop(m);
+        MissionDoneCount++;
+        if (m->getType() == MissionType::Polar) polarDoneCount++;
+        
+		tempDONEMissions.push(m);
+        
+        outputFile << m->getCompletionDay() << "    "
+                   << m->getID() << "    "
+                   << m->getRequestedDay() << "    "
+                   << m->getWaitingDays() << "    "
+                   << m->getMissionDuration() << "    "
+			       << m->getTurnaroundDays() << "\n";
+		Total_Wdays += m->getWaitingDays();
+		Total_Tdays += m->getTurnaroundDays();
+		Total_Mdur += m->getMissionDuration();
+	}
+    // Restore DONEMissions
+    while (!tempDONEMissions.isEmpty()) {
+        tempDONEMissions.pop(m);
+		DONEMissions.push(m);
+    }
+
+	outputFile << "\n----------------------\n" << endl;
+	
+    // Statistics
+    int Mission_Aborted = 0;
+    LinkedQueue<Mission*> tempAbortedMissions; 
+    while (!AbortedMissions.isEmpty()) {
+        AbortedMissions.dequeue(m);
+        Mission_Aborted++;
+        if (m->getType() == MissionType::Polar) {
+            polarAbortedCount++;
+        }
+        tempAbortedMissions.enqueue(m);
+    }
+    // Restore AbortedMissions
+    while (!tempAbortedMissions.isEmpty()) {
+        tempAbortedMissions.dequeue(m);
+        AbortedMissions.enqueue(m);
+    }
+    
+    int MissionTotalCount = MissionDoneCount + Mission_Aborted;
+    
+    double Average_Wdays = (MissionTotalCount > 0) ? ((double)Total_Wdays / MissionTotalCount) : 0.0;
+    double Average_Tdays = (MissionTotalCount > 0) ? ((double)Total_Tdays / MissionTotalCount) : 0.0;
+	double Avg_Mdur = (MissionTotalCount > 0) ? ((double)Total_Mdur / MissionTotalCount) : 0.0;
+    
+    int totalPolar = polarDoneCount + polarAbortedCount;
+    double autoAbortedPercentage = (totalPolar > 0) ? ((double)polarAbortedCount / totalPolar) * 100.0 : 0.0;
+
+    outputFile << "Missions: " << MissionTotalCount << " [Done: " << MissionDoneCount << ", Aborted: " << Mission_Aborted << "]"
+               << "\nRovers: " << (D + P + N) << " [D: " << D << ", P: " << P << ", N: " << N << "]"
+               << "\nAvg Wdays = " << Average_Wdays 
+               << ", Avg MDUR = " << Avg_Mdur 
+               << ", Avg Tdays = " << Average_Tdays << endl;
+    
+    outputFile << "% Avg_Wdays / Avg_MDUR = " << (Avg_Mdur > 0 ? (Average_Wdays / Avg_Mdur) * 100 : 0) << "%"
+               << ", Auto-aborted = " << autoAbortedPercentage << "%" << endl; 
+
+    outputFile.close();
+}
+
 void MarsStation::Simulate()
 {
     UI ui;
     
-    // Prompt for Mode
     int mode;
     cout << "Select Mode (1: Interactive, 2: Silent): ";
     cin >> mode;
@@ -377,10 +464,12 @@ void MarsStation::Simulate()
     
     if (mode == 2) {
         cout << "Silent Mode" << endl;
+        cout << "Simulation Starts..." << endl;
+    } else {
+        cout << "Interactive Mode" << endl;
+        cout << "Simulation Starts..." << endl;
     }
-    cout << "Simulation Starts..." << endl;
 
-    // Initialize
     int currentDay = 1; 
     LoadFromFile("input.txt"); 
 
@@ -401,7 +490,6 @@ void MarsStation::Simulate()
         UpdateEXECMissions(currentDay);
         UpdateBACKMissions(currentDay);
 
-        // Output / Interface 
         if (mode == 1)
         {
             ui.PrintDay(currentDay, this);
@@ -409,10 +497,7 @@ void MarsStation::Simulate()
             cin.get(); 
         }
 
-
-        //Termination Condition
-        //Break if all missions are DONE (and all other lists empty)
-        //Simple check for now:
+        // Termination Condition
         if (RequestsList.getCount() == 0 &&
             ReadyDiggingMissions.getCount() == 0 &&
             ReadyPolarMissions.getCount() == 0 &&
@@ -428,7 +513,7 @@ void MarsStation::Simulate()
     }
     
     cout << "Simulation ends, Output file created" << endl;
-    // GenerateOutputFile(); // Member 4
+    GenerateOutputFile();
 }
 
 LinkedQueue<Rover*>& MarsStation::getCheckupDiggingRovers() { return CheckupDiggingRovers; }
