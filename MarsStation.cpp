@@ -509,6 +509,13 @@ void MarsStation::GenerateOutputFile()
     
     while (!DONEMissions.isEmpty()) {
 		DONEMissions.pop(m);
+        
+        // Skip dummy return missions (ID == -1) from statistics and output
+        if (m->getID() == -1) {
+            tempDONEMissions.push(m);
+            continue;
+        }
+
         MissionDoneCount++;
         if (m->getType() == MissionType::Polar) polarDoneCount++;
         
