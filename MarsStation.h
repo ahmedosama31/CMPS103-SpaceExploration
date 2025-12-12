@@ -123,7 +123,7 @@ public:
     }
 
     // Helper to abort normal mission
-    bool AbortNormalMission(int missionID)
+    bool AbortMission(int missionID)
     {
         Mission* RDYAbortM = ReadyNormalMissions.Abortmission(missionID);
         if (RDYAbortM) 
@@ -158,10 +158,7 @@ public:
         }
     }
     
-    void AbortMission(int missionID)
-    {
-        AbortNormalMission(missionID);
-    }
+
 
     // Rover maintenance: Check if rover needs checkup after mission completion
     void ReleaseRover(Rover* r, int currentDay)
@@ -430,17 +427,19 @@ public:
 
         while (true)
         {
-            
+            //if request is mission: req -> mission, if request is abort call AbortMission()
             ExecuteRequests(currentDay);
-            
+            //check for polar mission abort
             AutoAbortPolarMissions(currentDay);
-
+            //check for rovers finishing checkup
             ManageCheckups(currentDay);
-
+            //assign missions to rovers
             AssignMissions(currentDay);
-            
+            //move missions from OUT to EXEC
             UpdateOUTMissions(currentDay);
+            //move missions from EXEC to BACK
             UpdateEXECMissions(currentDay);
+            //move missions from BACK to DONE
             UpdateBACKMissions(currentDay);
 
             // Output / Interface 

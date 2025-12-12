@@ -367,3 +367,4 @@ Project Docs/Phase2 - Project features weights - F25 - weights.csv
  
 /Project_Docs
 *.md
+/input.txt
