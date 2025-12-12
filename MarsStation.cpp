@@ -19,33 +19,57 @@ void MarsStation::LoadFromFile(const string& filename)
         return; 
     }
 
+    // ========== INPUT FILE FORMAT (Standard - No Bonus Features) ==========
+    // Line 1: D P N (number of Digging, Polar, Normal rovers)
+    // Line 2: SD SP SN (speed for Digging, Polar, Normal rovers - km/h)
+    // Line 3: M CD CP CN (M=missions before checkup, CD/CP/CN=checkup duration per type)
+    // Line 4: K (total number of requests)
+    // Lines 5+: Request lines (R = new mission request, X = abort request)
+    // ======================================================================
+
+    // Read rover counts for each type
     inputFile >> D >> P >> N;
+    
+    // Read rover speeds for each type (all rovers of same type have same speed)
     inputFile >> SD >> SP >> SN;
+    
+    // Read checkup parameters: missions before checkup, checkup duration per rover type
     inputFile >> M >> CD >> CP >> CN;
 
-    int id = 1;
+    int roverID = 1;  // Unique ID counter for all rovers
+    
+    // === CREATE DIGGING ROVERS ===
     for (int i = 0; i < D; i++)
-        AvailableDiggingRovers.enqueue(new Rover(id++, RoverType::Digging, SD, M, CD));
+        AvailableDiggingRovers.enqueue(new Rover(roverID++, RoverType::Digging, SD, M, CD));
+    
+    // === CREATE POLAR ROVERS ===
     for (int i = 0; i < P; i++)
-        AvailablePolarRovers.enqueue(new Rover(id++, RoverType::Polar, SP, M, CP));
+        AvailablePolarRovers.enqueue(new Rover(roverID++, RoverType::Polar, SP, M, CP));
+    
+    // === CREATE NORMAL ROVERS ===
     for (int i = 0; i < N; i++)
-        AvailableNormalRovers.enqueue(new Rover(id++, RoverType::Normal, SN, M, CN));
+        AvailableNormalRovers.enqueue(new Rover(roverID++, RoverType::Normal, SN, M, CN));
 
-    int K;
-    inputFile >> K;
-    for (int i = 0; i < K; i++) {
-        char RType; inputFile >> RType;
-        if (RType == 'R')
+    // === READ MISSION/ABORT REQUESTS ===
+    int totalRequests;
+    inputFile >> totalRequests;  // K: total number of request lines
+    
+    for (int i = 0; i < totalRequests; i++) {
+        char requestType;
+        inputFile >> requestType;
+        
+        if (requestType == 'R')  // New Mission Request
         {
-            char MType;
-            int RDay, ID, TLOC, MDUR;
-            inputFile >> MType >> RDay >> ID >> TLOC >> MDUR;
-            RequestsList.enqueue(new newRequest(RDay, ID, CharToMissionType(MType), TLOC, MDUR));
+            char missionType;  // D=Digging, P=Polar, N=Normal
+            int requestDay, missionID, targetLocation, missionDuration;
+            inputFile >> missionType >> requestDay >> missionID >> targetLocation >> missionDuration;
+            RequestsList.enqueue(new newRequest(requestDay, missionID, CharToMissionType(missionType), targetLocation, missionDuration));
         }
-        else if (RType == 'X') {
-            int XDay, ID;
-            inputFile >> XDay >> ID;
-            RequestsList.enqueue(new abortRequest(XDay, ID));
+        else if (requestType == 'X')  // Abort Mission Request
+        {
+            int abortDay, missionID;
+            inputFile >> abortDay >> missionID;
+            RequestsList.enqueue(new abortRequest(abortDay, missionID));
         }
     }
     inputFile.close();
