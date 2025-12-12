@@ -539,7 +539,7 @@ void MarsStation::GenerateOutputFile()
     // Header
     outputFile << "Simulation Output File\n" << endl;
     outputFile << "----------------------\n" << endl;
-    outputFile << "Fday  ID  Rday  Wdays  Mdur   Tdays\n";
+    outputFile << "Fday\tID\tRday\tWdays\tMdur\tTdays\n";
     
     long Total_Wdays = 0;
 	long Total_Tdays = 0;
@@ -569,12 +569,12 @@ void MarsStation::GenerateOutputFile()
         
 		tempDONEMissions.push(m);
         
-        outputFile << m->getCompletionDay() << "    "
-                   << m->getID() << "    "
-                   << m->getRequestedDay() << "    "
-                   << m->getWaitingDays() << "    "
-                   << m->getMissionDuration() << "    "
-			       << m->getTurnaroundDays() << "\n";
+        outputFile << m->getCompletionDay() << "\t"
+                   << m->getID() << "\t"
+                   << m->getRequestedDay() << "\t"
+                   << m->getWaitingDays() << "\t"
+                   << m->getMissionDuration() << "\t"
+                   << m->getTurnaroundDays() << "\n";
 		Total_Wdays += m->getWaitingDays();
 		Total_Tdays += m->getTurnaroundDays();
 		Total_Mdur += m->getMissionDuration();
@@ -606,9 +606,9 @@ void MarsStation::GenerateOutputFile()
     
     int MissionTotalCount = MissionDoneCount + Mission_Aborted;
     
-    double Average_Wdays = (MissionTotalCount > 0) ? ((double)Total_Wdays / MissionTotalCount) : 0.0;
-    double Average_Tdays = (MissionTotalCount > 0) ? ((double)Total_Tdays / MissionTotalCount) : 0.0;
-	double Avg_Mdur = (MissionTotalCount > 0) ? ((double)Total_Mdur / MissionTotalCount) : 0.0;
+    double Average_Wdays = (MissionDoneCount > 0) ? ((double)Total_Wdays / MissionDoneCount) : 0.0;
+    double Average_Tdays = (MissionDoneCount > 0) ? ((double)Total_Tdays / MissionDoneCount) : 0.0;
+	double Avg_Mdur = (MissionDoneCount > 0) ? ((double)Total_Mdur / MissionDoneCount) : 0.0;
     
     int totalPolar = polarDoneCount + polarAbortedCount;
     double autoAbortedPercentage = (totalPolar > 0) ? ((double)polarAbortedCount / totalPolar) * 100.0 : 0.0;
