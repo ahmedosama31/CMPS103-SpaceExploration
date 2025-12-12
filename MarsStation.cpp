@@ -24,12 +24,18 @@ void MarsStation::LoadFromFile(const string& filename)
     inputFile >> M >> CD >> CP >> CN;
 
     int id = 1;
-    for (int i = 0; i < D; i++)
-        AvailableDiggingRovers.enqueue(new Rover(id++, RoverType::Digging, SD, M, CD));
-    for (int i = 0; i < P; i++)
-        AvailablePolarRovers.enqueue(new Rover(id++, RoverType::Polar, SP, M, CP));
-    for (int i = 0; i < N; i++)
-        AvailableNormalRovers.enqueue(new Rover(id++, RoverType::Normal, SN, M, CN));
+    for (int i = 0; i < D; i++) {
+        Rover* r = new Rover(id++, RoverType::Digging, SD, M, CD);
+        AvailableDiggingRovers.enqueue(r, RoverPriQueue::calculatePriority(r));
+    }
+    for (int i = 0; i < P; i++) {
+        Rover* r = new Rover(id++, RoverType::Polar, SP, M, CP);
+        AvailablePolarRovers.enqueue(r, RoverPriQueue::calculatePriority(r));
+    }
+    for (int i = 0; i < N; i++) {
+        Rover* r = new Rover(id++, RoverType::Normal, SN, M, CN);
+        AvailableNormalRovers.enqueue(r, RoverPriQueue::calculatePriority(r));
+    }
 
     int K;
     inputFile >> K;
@@ -54,10 +60,11 @@ void MarsStation::LoadFromFile(const string& filename)
 bool MarsStation::EnqueueAvailable(Rover* r)
 {
     if (!r) return false;
+    int pri = RoverPriQueue::calculatePriority(r);
     switch (r->getType()) {
-    case RoverType::Digging: AvailableDiggingRovers.enqueue(r); break;
-    case RoverType::Polar:   AvailablePolarRovers.enqueue(r);   break;
-    case RoverType::Normal:  AvailableNormalRovers.enqueue(r);  break;
+    case RoverType::Digging: AvailableDiggingRovers.enqueue(r, pri); break;
+    case RoverType::Polar:   AvailablePolarRovers.enqueue(r, pri);   break;
+    case RoverType::Normal:  AvailableNormalRovers.enqueue(r, pri);  break;
     }
     return true;
 }
@@ -206,15 +213,16 @@ void MarsStation::AssignMissions(int currentDay)
     while (ReadyPolarMissions.peek(m))
     {
         r = nullptr;
-        if (AvailablePolarRovers.dequeue(r))
+        int pri;
+        if (AvailablePolarRovers.dequeue(r, pri))
         {
             r->assignMission(m); 
         }
-        else if (AvailableNormalRovers.dequeue(r))
+        else if (AvailableNormalRovers.dequeue(r, pri))
         {
             r->assignMission(m); 
         }
-        else if (AvailableDiggingRovers.dequeue(r))
+        else if (AvailableDiggingRovers.dequeue(r, pri))
         {
             r->assignMission(m); 
         }
@@ -239,7 +247,8 @@ void MarsStation::AssignMissions(int currentDay)
     while (ReadyDiggingMissions.peek(m))
     {
         r = nullptr; 
-        if (AvailableDiggingRovers.dequeue(r))
+        int pri;
+        if (AvailableDiggingRovers.dequeue(r, pri))
         {
             r->assignMission(m); 
             ReadyDiggingMissions.dequeue(m);
@@ -260,11 +269,12 @@ void MarsStation::AssignMissions(int currentDay)
     while (ReadyNormalMissions.peek(m))
     {
         r = nullptr; 
-        if (AvailableNormalRovers.dequeue(r))
+        int pri;
+        if (AvailableNormalRovers.dequeue(r, pri))
         {
             r->assignMission(m); 
         }
-        else if (AvailablePolarRovers.dequeue(r))
+        else if (AvailablePolarRovers.dequeue(r, pri))
         {
             r->assignMission(m); 
         }
@@ -434,9 +444,9 @@ void MarsStation::Simulate()
 LinkedQueue<Rover*>& MarsStation::getCheckupDiggingRovers() { return CheckupDiggingRovers; }
 LinkedQueue<Rover*>& MarsStation::getCheckupPolarRovers()   { return CheckupPolarRovers; }
 LinkedQueue<Rover*>& MarsStation::getCheckupNormalRovers()  { return CheckupNormalRovers; }
-LinkedQueue<Rover*>& MarsStation::getAvailableDiggingRovers(){ return AvailableDiggingRovers; }
-LinkedQueue<Rover*>& MarsStation::getAvailablePolarRovers() { return AvailablePolarRovers; }
-LinkedQueue<Rover*>& MarsStation::getAvailableNormalRovers(){ return AvailableNormalRovers; }
+RoverPriQueue& MarsStation::getAvailableDiggingRovers(){ return AvailableDiggingRovers; }
+RoverPriQueue& MarsStation::getAvailablePolarRovers() { return AvailablePolarRovers; }
+RoverPriQueue& MarsStation::getAvailableNormalRovers(){ return AvailableNormalRovers; }
 LinkedQueue<Requests*>& MarsStation::getRequestsList()      { return RequestsList; }
 LinkedQueue<Mission*>&  MarsStation::getReadyDiggingMissions(){ return ReadyDiggingMissions; }
 LinkedQueue<Mission*>&  MarsStation::getReadyPolarMissions() { return ReadyPolarMissions; }

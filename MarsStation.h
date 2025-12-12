@@ -8,13 +8,14 @@
 #include "mission.h"    
 #include "Requests.h"
 #include "ArrayStack.h"
+#include "RoverPriQueue.h"
 
 class MarsStation {
 private:
     // Rover Lists
-    LinkedQueue<Rover*> AvailableDiggingRovers; 
-    LinkedQueue<Rover*> AvailablePolarRovers;   
-    LinkedQueue<Rover*> AvailableNormalRovers;  
+    RoverPriQueue AvailableDiggingRovers; 
+    RoverPriQueue AvailablePolarRovers;   
+    RoverPriQueue AvailableNormalRovers;  
     LinkedQueue<Rover*> CheckupDiggingRovers;   
     LinkedQueue<Rover*> CheckupPolarRovers;     
     LinkedQueue<Rover*> CheckupNormalRovers;    
@@ -71,9 +72,9 @@ public:
     LinkedQueue<Rover*>& getCheckupDiggingRovers();
     LinkedQueue<Rover*>& getCheckupPolarRovers();
     LinkedQueue<Rover*>& getCheckupNormalRovers();
-    LinkedQueue<Rover*>& getAvailableDiggingRovers();
-    LinkedQueue<Rover*>& getAvailablePolarRovers();
-    LinkedQueue<Rover*>& getAvailableNormalRovers();
+    RoverPriQueue& getAvailableDiggingRovers();
+    RoverPriQueue& getAvailablePolarRovers();
+    RoverPriQueue& getAvailableNormalRovers();
     LinkedQueue<Requests*>& getRequestsList();
     LinkedQueue<Mission*>&  getReadyDiggingMissions();
     LinkedQueue<Mission*>&  getReadyPolarMissions();
