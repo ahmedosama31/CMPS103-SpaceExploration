@@ -19,7 +19,7 @@ void MarsStation::LoadFromFile(const string& filename)
         return; 
     }
 
-    // ========== INPUT FILE FORMAT (Standard - No Bonus Features) ==========
+    // ========== INPUT FILE FORMAT ==========
     // Line 1: D P N (number of Digging, Polar, Normal rovers)
     // Line 2: SD SP SN (speed for Digging, Polar, Normal rovers - km/h)
     // Line 3: M CD CP CN (M=missions before checkup, CD/CP/CN=checkup duration per type)
