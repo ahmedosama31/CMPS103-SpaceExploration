@@ -23,11 +23,13 @@ void UI::PrintDay(int day, MarsStation* ms)
     cout << "================ Available Rovers List(s) =================" << endl;
     int availCount = ms->getAvailableNormalRovers().getCount() + 
                      ms->getAvailablePolarRovers().getCount() + 
-                     ms->getAvailableDiggingRovers().getCount();
+                     ms->getAvailableDiggingRovers().getCount() +
+                     ms->getAvailableRescueRovers().getCount();
     cout << availCount << " Available Rovers: ";
     cout << "NR["; ms->getAvailableNormalRovers().print(); cout << "]  ";
     cout << "PR["; ms->getAvailablePolarRovers().print(); cout << "]  ";
-    cout << "DR["; ms->getAvailableDiggingRovers().print(); cout << "]" << endl;
+    cout << "DR["; ms->getAvailableDiggingRovers().print(); cout << "]  ";
+    cout << "RR["; ms->getAvailableRescueRovers().print(); cout << "]" << endl;
 
     cout << "================ OUT List(s) =================" << endl;
     cout << ms->getOUTMissions().getCount() << " Missions/Rovers: ";
@@ -57,10 +59,11 @@ void UI::PrintDay(int day, MarsStation* ms)
     cout << "================ Checkup List(s) =================" << endl;
     int checkupCount = ms->getCheckupNormalRovers().getCount() + 
                        ms->getCheckupPolarRovers().getCount() + 
-                       ms->getCheckupDiggingRovers().getCount();
+                       ms->getCheckupDiggingRovers().getCount() +
+                       ms->getCheckupRescueRovers().getCount();
     cout << checkupCount << " Rovers: [";
     
-    // Checkup list needs careful comma handling between lists
+    
     bool printed = false;
     if (ms->getCheckupNormalRovers().getCount() > 0) {
         ms->getCheckupNormalRovers().print();
@@ -76,6 +79,12 @@ void UI::PrintDay(int day, MarsStation* ms)
     if (ms->getCheckupDiggingRovers().getCount() > 0) {
         if (printed) cout << ", ";
         ms->getCheckupDiggingRovers().print();
+        printed = true;
+    }
+    
+    if (ms->getCheckupRescueRovers().getCount() > 0) {
+        if (printed) cout << ", ";
+        ms->getCheckupRescueRovers().print();
     }
     
     cout << "]" << endl;

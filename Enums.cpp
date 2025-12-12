@@ -19,19 +19,17 @@ char MissionTypeToChar(MissionType t) {
 }
 
 RoverType CharToRoverType(char c) {
-    switch (c) {
-    case 'D': return RoverType::Digging;
-    case 'P': return RoverType::Polar;
-    case 'N': return RoverType::Normal;
-    default: throw "Invalid char for RoverType";
-    }
+    if (c == 'D') return RoverType::Digging;
+    if (c == 'P') return RoverType::Polar;
+    if (c == 'N') return RoverType::Normal;
+    if (c == 'R') return RoverType::Rescue;
+    return RoverType::Normal;
 }
 
 char RoverTypeToChar(RoverType t) {
-    switch (t) {
-    case RoverType::Digging: return 'D';
-    case RoverType::Polar:   return 'P';
-    case RoverType::Normal:  return 'N';
-    default: throw "Invalid RoverType value";
-    }
+    if (t == RoverType::Digging) return 'D';
+    if (t == RoverType::Polar) return 'P';
+    if (t == RoverType::Normal) return 'N';
+    if (t == RoverType::Rescue) return 'R';
+    return 'N';
 }

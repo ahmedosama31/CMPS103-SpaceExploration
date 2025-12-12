@@ -17,9 +17,11 @@ private:
     RoverPriQueue AvailableDiggingRovers; 
     RoverPriQueue AvailablePolarRovers;   
     RoverPriQueue AvailableNormalRovers;  
+    RoverPriQueue AvailableRescueRovers;
     LinkedQueue<Rover*> CheckupDiggingRovers;   
     LinkedQueue<Rover*> CheckupPolarRovers;     
-    LinkedQueue<Rover*> CheckupNormalRovers;    
+    LinkedQueue<Rover*> CheckupNormalRovers;
+    LinkedQueue<Rover*> CheckupRescueRovers;    
     
     // Mission Lists
     LinkedQueue<Mission*> ReadyDiggingMissions; 
@@ -31,16 +33,17 @@ private:
     ArrayStack<Mission*>  DONEMissions;       
     LinkedQueue<Mission*> AbortedMissions;    
     LinkedQueue<Mission*> FailedMissions;
+    LinkedQueue<Rover*>   StrandedRovers;  // Rovers waiting at failed mission site for rescue
   
     // Request List
     LinkedQueue<Requests*> RequestsList;
 
 public:
     // Simulation Parameters
-    int D = 0, P = 0, N = 0; 
-    int SD = 0, SP = 0, SN = 0; 
+    int D = 0, P = 0, N = 0, R = 0; 
     int M = 0; 
-    int CD = 0, CP = 0, CN = 0; 
+    int CR = 0; // Checkup duration (same for all rover types)
+    int FP = 5; // Failure probability % 
 
     void LoadFromFile(const std::string& filename);
 
@@ -76,9 +79,11 @@ public:
     LinkedQueue<Rover*>& getCheckupDiggingRovers();
     LinkedQueue<Rover*>& getCheckupPolarRovers();
     LinkedQueue<Rover*>& getCheckupNormalRovers();
+    LinkedQueue<Rover*>& getCheckupRescueRovers();
     RoverPriQueue& getAvailableDiggingRovers();
     RoverPriQueue& getAvailablePolarRovers();
     RoverPriQueue& getAvailableNormalRovers();
+    RoverPriQueue& getAvailableRescueRovers();
     LinkedQueue<Requests*>& getRequestsList();
     LinkedQueue<Mission*>&  getReadyDiggingMissions();
     LinkedQueue<Mission*>&  getReadyPolarMissions();

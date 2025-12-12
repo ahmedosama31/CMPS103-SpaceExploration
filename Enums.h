@@ -8,7 +8,8 @@ enum class MissionType {
 enum class RoverType {
     Digging,
     Polar,
-    Normal
+    Normal,
+    Rescue
 };
 
 MissionType CharToMissionType(char c);

@@ -15,6 +15,7 @@ private:
     int LaunchDay;
     bool Aborted;
     bool Failed;
+    bool Rescued;
     int CompletionDay;
     Rover* AssignedRover;
 public:
@@ -34,6 +35,7 @@ public:
     int getTurnaroundDays() const;
     bool isAborted() const;
     bool isFailed() const;
+    bool isRescued() const;
     Rover* getAssignedRover() const;
 
     // Setters
@@ -44,6 +46,7 @@ public:
     void assignRover(Rover* r);
     void setAborted(bool a);
     void setFailed(bool f);
+    void setRescued(bool r);
     
     friend std::ostream& operator<<(std::ostream& os, const Mission& m);
     friend std::ostream& operator<<(std::ostream& os, const Mission* m);
