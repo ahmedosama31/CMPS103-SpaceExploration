@@ -74,6 +74,9 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MarsStation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="abortRequest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

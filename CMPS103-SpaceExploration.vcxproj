@@ -144,6 +144,7 @@
     <ClCompile Include="abortRequest.cpp" />
     <ClCompile Include="Enums.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MarsStation.cpp" />
     <ClCompile Include="Mission.cpp" />
     <ClCompile Include="newRequest.cpp" />
     <ClCompile Include="priQueue.h" />
