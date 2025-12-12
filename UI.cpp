@@ -49,6 +49,11 @@ void UI::PrintDay(int day, MarsStation* ms)
     ms->getAbortedMissions().print(); 
     cout << "]" << endl;
 
+    cout << "================ Failed List(s) =================" << endl;
+    cout << ms->getFailedMissions().getCount() << " Missions: [";
+    ms->getFailedMissions().print(); 
+    cout << "]" << endl;
+
     cout << "================ Checkup List(s) =================" << endl;
     int checkupCount = ms->getCheckupNormalRovers().getCount() + 
                        ms->getCheckupPolarRovers().getCount() + 

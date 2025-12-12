@@ -204,6 +204,56 @@ void MarsStation::AutoAbortPolarMissions(int currentDay)
     }
 }
 
+void MarsStation::HandleRescueMissions(int currentDay)
+{
+    LinkedQueue<Mission*> tempQueue;
+    Mission* m = nullptr;
+    Rover* r = nullptr;
+    int pri;
+
+    while(FailedMissions.dequeue(m))
+    {
+        r = nullptr;
+        // Rescue Logic: Try appropriate rover, then others
+        if (m->getType() == MissionType::Polar) {
+            if (AvailablePolarRovers.dequeue(r, pri)) {}
+            else if (AvailableNormalRovers.dequeue(r, pri)) {}
+            else if (AvailableDiggingRovers.dequeue(r, pri)) {}
+        }
+        else if (m->getType() == MissionType::Digging) {
+            if (AvailableDiggingRovers.dequeue(r, pri)) {}
+            else if (AvailableNormalRovers.dequeue(r, pri)) {} // Allow non-digging to rescue? Maybe not work, but for rescue transport it's fine.
+            else if (AvailablePolarRovers.dequeue(r, pri)) {}
+        }
+        else { // Normal
+            if (AvailableNormalRovers.dequeue(r, pri)) {}
+            else if (AvailablePolarRovers.dequeue(r, pri)) {}
+            else if (AvailableDiggingRovers.dequeue(r, pri)) {}
+        }
+
+        if (r) {
+            r->assignMission(m);
+            // Recalculate travel
+            double travelHours = (double)m->getTargetLocation() / r->getSpeed();
+            int travelDays = ceil(travelHours / 25.0);
+            int arrivalDay = currentDay + travelDays;
+            
+            // Set launch day again? Yes, strictly it's a new launch.
+            m->setLaunchDay(currentDay);
+            // Waiting days? It waited from RequestDay.
+            m->setWaitingDays(currentDay - m->getRequestedDay());
+            
+            OUTMissions.enqueue(m, -arrivalDay);
+        } else {
+            tempQueue.enqueue(m);
+        }
+    }
+    
+    while(tempQueue.dequeue(m)) {
+        FailedMissions.enqueue(m);
+    }
+}
+
 void MarsStation::AssignMissions(int currentDay)        
 {
     Mission* m = nullptr;
@@ -303,6 +353,37 @@ void MarsStation::UpdateOUTMissions(int currentDay)
 
     while (OUTMissions.peek(m, pri))
     {
+        // Probability of failure: 5%
+        int randFail = rand() % 100;
+        if (randFail < 5) 
+        {
+            OUTMissions.dequeue(m, pri);
+            m->setFailed(true);
+            FailedMissions.enqueue(m);
+            
+            // Move rover to BACK list to return to base
+            Rover* r = m->getAssignedRover();
+            if (r) {
+                // Calculate return duration based on days traveled so far
+                int daysTraveled = currentDay - m->getLaunchDay();
+                int returnDay = currentDay + daysTraveled;
+                
+                // We need to put the rover in BACK list. 
+                // BUT BACK list stores Missions. 
+                // We will create a dummy "Failed" mission just to transport the rover back?
+                // Or better, we keep the rover associated with the mission UNTIL it returns?
+                // But the mission needs to be in FailedMissions waiting for rescue.
+                
+                // Solution: Create a dummy mission for the rover's return trip
+                Mission* returnM = new Mission(-1, m->getType(), m->getTargetLocation(), 0, currentDay);
+                returnM->assignRover(r);
+                BACKMissions.enqueue(returnM, -returnDay);
+                
+                m->assignRover(nullptr); // Unassign from the failed mission so it can be rescued
+            }
+            continue; 
+        }
+
         int arrivalDay = -pri;
         if (arrivalDay <= currentDay)
         {
@@ -325,6 +406,32 @@ void MarsStation::UpdateEXECMissions(int currentDay)
 
     while (EXECMissions.peek(m, pri))
     {
+        // Probability of failure: 5%
+        int randFail = rand() % 100;
+        if (randFail < 5) 
+        {
+            EXECMissions.dequeue(m, pri);
+            m->setFailed(true);
+            FailedMissions.enqueue(m);
+            
+            Rover* r = m->getAssignedRover();
+            if (r) {
+                // Rover is at target, needs full travel time to return
+                double speed = r->getSpeed();
+                double targetloc = m->getTargetLocation();
+                double travelHours = targetloc / speed;
+                int travelDays = ceil(travelHours / 25.0); 
+                int returnDay = currentDay + travelDays;
+                
+                Mission* returnM = new Mission(-1, m->getType(), m->getTargetLocation(), 0, currentDay);
+                returnM->assignRover(r);
+                BACKMissions.enqueue(returnM, -returnDay);
+                
+                m->assignRover(nullptr); 
+            }
+            continue;
+        }
+
         int Fday = -pri;
         if (Fday <= currentDay) 
         {
@@ -406,6 +513,7 @@ void MarsStation::Simulate()
         ExecuteRequests(currentDay);
         AutoAbortPolarMissions(currentDay);
         ManageCheckups(currentDay);
+        HandleRescueMissions(currentDay);
         AssignMissions(currentDay);
         UpdateOUTMissions(currentDay);
         UpdateEXECMissions(currentDay);
@@ -455,4 +563,5 @@ OUT_missions&          MarsStation::getOUTMissions()        { return OUTMissions
 priQueue<Mission*>&    MarsStation::getEXECMissions()       { return EXECMissions; }  
 priQueue<Mission*>&    MarsStation::getBACKMissions()       { return BACKMissions; }   
 LinkedQueue<Mission*>& MarsStation::getAbortedMissions()    { return AbortedMissions; }
+LinkedQueue<Mission*>& MarsStation::getFailedMissions()     { return FailedMissions; }
 ArrayStack<Mission*>&  MarsStation::getDONEMissions()       { return DONEMissions; }

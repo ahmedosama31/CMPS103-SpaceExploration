@@ -5,7 +5,7 @@ Mission::Mission(int id, MissionType type, int targetlocation,
                  int missionduration, int requestday)
     : ID(id), Type(type), TargetLocation(targetlocation),
       MissionDuration(missionduration), RequestedDay(requestday),
-      WaitingDays(0), ExecutionDays(0), CompletionDay(0), LaunchDay(0), Aborted(false), AssignedRover(nullptr) {}
+      WaitingDays(0), ExecutionDays(0), CompletionDay(0), LaunchDay(0), Aborted(false), Failed(false), AssignedRover(nullptr) {}
 
 int Mission::getID() const { return ID; }
 MissionType Mission::getType() const { return Type; }
@@ -17,6 +17,7 @@ int Mission::getExecutionDays() const { return ExecutionDays; }
 int Mission::getLaunchDay() const { return LaunchDay; }
 int Mission::getCompletionDay() const { return CompletionDay; }
 bool Mission::isAborted() const { return Aborted; }
+bool Mission::isFailed() const { return Failed; }
 Rover* Mission::getAssignedRover() const { return AssignedRover; }
 
 void Mission::setWaitingDays(int w) { WaitingDays = w; }
@@ -25,6 +26,7 @@ void Mission::setLaunchDay(int l) { LaunchDay = l; }
 void Mission::setCompletionDay(int c) { CompletionDay = c; }
 void Mission::assignRover(Rover* r) { AssignedRover = r; }
 void Mission::setAborted(bool a) { Aborted = a; }
+void Mission::setFailed(bool f) { Failed = f; }
 
 std::ostream& operator<<(std::ostream& os, const Mission& m)
 {

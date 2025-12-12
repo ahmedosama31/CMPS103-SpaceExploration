@@ -29,6 +29,7 @@ private:
     priQueue<Mission*>    BACKMissions;       
     ArrayStack<Mission*>  DONEMissions;       
     LinkedQueue<Mission*> AbortedMissions;    
+    LinkedQueue<Mission*> FailedMissions;
   
     // Request List
     LinkedQueue<Requests*> RequestsList;
@@ -60,6 +61,7 @@ public:
 
     // Mission assignment
     void AssignMissions(int currentDay);        
+    void HandleRescueMissions(int currentDay);
  
     // Move missions lists
     void UpdateOUTMissions(int currentDay);
@@ -83,5 +85,6 @@ public:
     priQueue<Mission*>&    getEXECMissions();  
     priQueue<Mission*>&    getBACKMissions();   
     LinkedQueue<Mission*>& getAbortedMissions();
+    LinkedQueue<Mission*>& getFailedMissions();
     ArrayStack<Mission*>&  getDONEMissions();
 };
