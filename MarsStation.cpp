@@ -507,9 +507,9 @@ void MarsStation::Simulate()
     while (true)
     {
         ExecuteRequests(currentDay);
+        AutoAbortPolarMissions(currentDay);
         ManageCheckups(currentDay);
         UpdateBACKMissions(currentDay);
-        AutoAbortPolarMissions(currentDay);
         AssignMissions(currentDay);
         UpdateOUTMissions(currentDay);
         UpdateEXECMissions(currentDay);
