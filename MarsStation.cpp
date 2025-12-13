@@ -717,18 +717,29 @@ void MarsStation::Simulate()
 
 MarsStation::~MarsStation()
 {
-    
     Rover* r = nullptr;
+    int roverPri = 0;
     
-    while (AvailableDiggingRovers.dequeue(r)) { delete r; }
-    while (AvailablePolarRovers.dequeue(r))   { delete r; }
-    while (AvailableNormalRovers.dequeue(r))  { delete r; }
-    while (CheckupDiggingRovers.dequeue(r))   { delete r; }
-    while (CheckupPolarRovers.dequeue(r))     { delete r; }
-    while (CheckupNormalRovers.dequeue(r))    { delete r; }
+    // === DELETE ALL ROVERS ===
+    // Available rovers are in RoverPriQueue (priority queues)
+    while (AvailableDiggingRovers.dequeue(r, roverPri)) { delete r; }
+    while (AvailablePolarRovers.dequeue(r, roverPri))   { delete r; }
+    while (AvailableNormalRovers.dequeue(r, roverPri))  { delete r; }
+    while (AvailableRescueRovers.dequeue(r, roverPri))  { delete r; }
+    
+    // Checkup rovers are in LinkedQueue
+    while (CheckupDiggingRovers.dequeue(r)) { delete r; }
+    while (CheckupPolarRovers.dequeue(r))   { delete r; }
+    while (CheckupNormalRovers.dequeue(r))  { delete r; }
+    while (CheckupRescueRovers.dequeue(r))  { delete r; }
+    
+    // Stranded
+    // 
+    // rovers waiting for rescue
+    while (StrandedRovers.dequeue(r)) { delete r; }
     
     // === DELETE ALL MISSIONS ===
-    // Missions can be in Ready, OUT, EXEC, BACK, DONE, or Aborted lists
+    // Missions can be in Ready, OUT, EXEC, BACK, DONE, Aborted, or Failed lists
     Mission* m = nullptr;
     int pri = 0;
     
@@ -747,6 +758,9 @@ MarsStation::~MarsStation()
     
     // Aborted missions
     while (AbortedMissions.dequeue(m)) { delete m; }
+    
+    // Failed missions (waiting for rescue)
+    while (FailedMissions.dequeue(m)) { delete m; }
     
     // === DELETE ANY REMAINING REQUESTS ===
     // (Should normally be empty after simulation, but clean up just in case)
