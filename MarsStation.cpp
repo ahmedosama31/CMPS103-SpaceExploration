@@ -523,7 +523,6 @@ void MarsStation::Simulate()
 
     if (mode == 1)
     {
-        ui.PrintDay(1, this);
         cout << "Press Enter to start simulation...";
         cin.get();
     }
