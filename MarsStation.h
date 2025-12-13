@@ -48,7 +48,7 @@ public:
     void LoadFromFile(const std::string& filename);
 
     // Helper functions
-    bool EnqueueAvailable(Rover* r);
+    void EnqueueAvailable(Rover* r);
     bool EnqueueCheckup(Rover* r);
     void InsertMission(Mission* M);
     bool AbortMission(int missionID, int currentDay);

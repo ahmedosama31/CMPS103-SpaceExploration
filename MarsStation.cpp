@@ -100,19 +100,18 @@ void MarsStation::LoadFromFile(const string& filename)
     inputFile.close();
 }
 
-bool MarsStation::EnqueueAvailable(Rover* r)
+void MarsStation::EnqueueAvailable(Rover* r)
 {
-    if (!r) return false;
+    if (!r) return;
     int pri = RoverPriQueue::calculatePriority(r);
     if (r->getType() == RoverType::Digging)
-        return AvailableDiggingRovers.enqueue(r, pri);
+        AvailableDiggingRovers.enqueue(r, pri);
     else if (r->getType() == RoverType::Polar)
-        return AvailablePolarRovers.enqueue(r, pri);
+        AvailablePolarRovers.enqueue(r, pri);
     else if (r->getType() == RoverType::Normal)
-        return AvailableNormalRovers.enqueue(r, pri);
+        AvailableNormalRovers.enqueue(r, pri);
     else if (r->getType() == RoverType::Rescue)
-        return AvailableRescueRovers.enqueue(r, pri);
-    return false;
+        AvailableRescueRovers.enqueue(r, pri);
 }
 
 bool MarsStation::EnqueueCheckup(Rover* r)
