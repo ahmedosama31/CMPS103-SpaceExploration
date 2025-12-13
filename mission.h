@@ -50,5 +50,5 @@ public:
     
 };
 
-// Output operator (non-friend, uses public getters)
+// Output operator 
 std::ostream& operator<<(std::ostream& os, const Mission& m);

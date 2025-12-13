@@ -19,21 +19,21 @@ void MarsStation::LoadFromFile(const string& filename)
         return; 
     }
 
-    // ========== INPUT FILE FORMAT ==========
+    // INPUt file format
     // Line 1: D P N R (number of Digging, Polar, Normal, Rescue rovers)
     // Line 2: M CR FP (missions before checkup, checkup duration, failure probability %)
-    // Line 3: Individual speeds for each Digging rover (D values)
-    // Line 4: Individual speeds for each Polar rover (P values)
-    // Line 5: Individual speeds for each Normal rover (N values)
-    // Line 6: Individual speeds for each Rescue rover (R values)
+    // Line 3: speeds for each Digging rover (D values)
+    // Line 4: speeds for each Polar rover (P values)
+    // Line 5: speeds for each Normal rover (N values)
+    // Line 6: speeds for each Rescue rover (R values)
     // Line 7: K (total number of requests)
-    // Lines 8+: Request lines (R = new mission, X = abort mission)
-    // =======================================
+    // Lines 8 to end : Request lines (R = new mission, X = abort mission)
+
 
     // Read rover counts for each type
     inputFile >> D >> P >> N >> R;
     
-    // Read shared parameters: missions before checkup, checkup duration, failure probability
+    // Read missions before checkup, checkup duration, failure probability
     inputFile >> M >> CR >> FP;
 
     int roverID = 1;  // Unique ID counter for all rovers
@@ -100,6 +100,8 @@ void MarsStation::LoadFromFile(const string& filename)
     inputFile.close();
 }
 
+
+
 void MarsStation::EnqueueAvailable(Rover* r)
 {
     if (!r) return;
@@ -114,6 +116,7 @@ void MarsStation::EnqueueAvailable(Rover* r)
         AvailableRescueRovers.enqueue(r, pri);
 }
 
+//=== MOVE ROVER TO ITS CHECKUP QUEUE====
 bool MarsStation::EnqueueCheckup(Rover* r)
 {
     if (!r) return false;
@@ -125,7 +128,7 @@ bool MarsStation::EnqueueCheckup(Rover* r)
     }
     return true;
 }
-
+//=== MOVE MISSION TO ITS READY QUEUE====
 void MarsStation::InsertMission(Mission* M)
 {
     switch (M->getType()) {
@@ -135,6 +138,7 @@ void MarsStation::InsertMission(Mission* M)
     }
 }
 
+//=====PROCESS ABORT MISSIONS====
 bool MarsStation::AbortMission(int missionID, int currentDay)
 {
     Mission* RDYAbortM = ReadyNormalMissions.Abortmission(missionID);
@@ -159,6 +163,7 @@ bool MarsStation::AbortMission(int missionID, int currentDay)
 
     return false;
 }
+
 
 void MarsStation::ExecuteRequests(int currentDay)
 {
@@ -427,7 +432,7 @@ void MarsStation::UpdateOUTMissions(int currentDay)
             
             // Check if this is a RESCUE mission arriving at failed mission location
             if (m->isRescued()) {
-                // Rescue rover has arrived - send stranded rover back
+                // Rescue rover has arrived  send stranded rover back
                 Rover* strandedRover = nullptr;
                 if (StrandedRovers.dequeue(strandedRover)) {
                     // Calculate return journey for stranded rover
@@ -514,8 +519,7 @@ void MarsStation::UpdateBACKMissions(int currentDay)
         if (returnDay <= currentDay)
         {
             BACKMissions.dequeue(m, pri);
-            // Check if the mission was aborted (and moved to BACK as part of abort)
-            // Check if the mission was aborted (and moved to BACK as part of abort)
+            // Check if the mission was aborted (and moved to BACK in abort)
             if (m->isAborted()) {
                 AbortedMissions.enqueue(m);
             } else {
@@ -552,7 +556,7 @@ void MarsStation::GenerateOutputFile(int totalDays)
     int polarAbortedCount = 0;
     int rescuedCount = 0;  // Track rescued missions
 
-    // Preserve DONEMissions while iterating for output
+    // Preserve DONEMissions for output
     ArrayStack<Mission*> tempDONEMissions;
     Mission* m;
     int MissionDoneCount = 0;
@@ -767,7 +771,7 @@ MarsStation::~MarsStation()
     while (FailedMissions.dequeue(m)) { delete m; }
     
     // === DELETE ANY REMAINING REQUESTS ===
-    // (Should normally be empty after simulation, but clean up just in case)
+    // (Should be empty after    simulation, clean up just in case)
     Requests* req = nullptr;
     while (RequestsList.dequeue(req)) { delete req; }
 }

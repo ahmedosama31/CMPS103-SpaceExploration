@@ -46,5 +46,5 @@ public:
 
 };
 
-// Output operator (non-friend, uses public getters)
+// Output operator
 ostream& operator<<(ostream& os, const Rover& r);
