@@ -701,7 +701,8 @@ void MarsStation::Simulate()
             ReadyNormalMissions.getCount() == 0 &&
             OUTMissions.getCount() == 0 &&
             EXECMissions.getCount() == 0 &&
-            BACKMissions.getCount() == 0)
+            BACKMissions.getCount() == 0 &&
+            FailedMissions.getCount() == 0)
         {
             break;
         }
