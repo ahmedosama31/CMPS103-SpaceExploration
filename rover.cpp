@@ -51,16 +51,6 @@ bool Rover::needsCheckup() const {
 
 ostream& operator<<(ostream& os, const Rover& r)
 {
-    os << r.ID;
-    return os;
-}
-
-ostream& operator<<(ostream& os, const Rover* r)
-{
-    if (r)
-        os << *r;      // Call the operator<< for Rover&
-    else
-        os << "[NULL Rover]";
-
+    os << r.getID();
     return os;
 }

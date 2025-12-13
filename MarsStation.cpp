@@ -528,7 +528,7 @@ void MarsStation::UpdateBACKMissions(int currentDay)
 }
 
 // Output File Generation
-void MarsStation::GenerateOutputFile()
+void MarsStation::GenerateOutputFile(int totalDays)
 {
     ofstream outputFile("output.txt");
     if (!outputFile.is_open()) {
@@ -589,12 +589,33 @@ void MarsStation::GenerateOutputFile()
     // Statistics
     int Mission_Aborted = 0;
     LinkedQueue<Mission*> tempAbortedMissions; 
+    
+    // Counters for mission types (Done + Aborted)
+    int nN = 0, nP = 0, nD = 0;
+
+    ArrayStack<Mission*> tempStackForCounts;
+    while (!DONEMissions.isEmpty()) {
+        DONEMissions.pop(m);
+        if (m->getType() == MissionType::Normal) nN++;
+        else if (m->getType() == MissionType::Polar) nP++;
+        else if (m->getType() == MissionType::Digging) nD++;
+        tempStackForCounts.push(m);
+    }
+    while (!tempStackForCounts.isEmpty()) {
+        tempStackForCounts.pop(m);
+        DONEMissions.push(m);
+    }
+
     while (!AbortedMissions.isEmpty()) {
         AbortedMissions.dequeue(m);
         Mission_Aborted++;
-        if (m->getType() == MissionType::Polar) {
+        if (m->getType() == MissionType::Normal) nN++;
+        else if (m->getType() == MissionType::Polar) {
+            nP++;
             polarAbortedCount++;
         }
+        else if (m->getType() == MissionType::Digging) nD++;
+        
         tempAbortedMissions.enqueue(m);
     }
     // Restore AbortedMissions
@@ -612,7 +633,8 @@ void MarsStation::GenerateOutputFile()
     int totalPolar = polarDoneCount + polarAbortedCount;
     double autoAbortedPercentage = (totalPolar > 0) ? ((double)polarAbortedCount / totalPolar) * 100.0 : 0.0;
 
-    outputFile << "Missions: " << MissionTotalCount << " [Done: " << MissionDoneCount << ", Aborted: " << Mission_Aborted << ", Failed: " << FailedMissions.getCount() << "]"
+    outputFile << "Missions: " << MissionTotalCount << " [N: " << nN << ", P: " << nP << ", D: " << nD << "]"
+               << " [Done: " << MissionDoneCount << ", Aborted: " << Mission_Aborted << ", Failed: " << FailedMissions.getCount() << "]"
                << "\nRovers: " << (D + P + N + R) << " [D: " << D << ", P: " << P << ", N: " << N << ", R: " << R << "]"
                << "\nRescue Missions: " << rescuedCount
                << "\nFailure Probability: " << FP << "%"
@@ -621,7 +643,9 @@ void MarsStation::GenerateOutputFile()
                << ", Avg Tdays = " << Average_Tdays << endl;
     
     outputFile << "% Avg_Wdays / Avg_MDUR = " << (Avg_Mdur > 0 ? (Average_Wdays / Avg_Mdur) * 100 : 0) << "%"
-               << ", Auto-aborted = " << autoAbortedPercentage << "%" << endl; 
+               << ", Auto-aborted = " << autoAbortedPercentage << "%" << endl;
+    
+    outputFile << "Total Simulation Days = " << totalDays << endl; 
 
     outputFile.close();
 }
@@ -648,7 +672,7 @@ void MarsStation::Simulate()
 
     if (mode == 1)
     {
-        ui.PrintDay(0, this);
+        ui.PrintDay(1, this);
         cout << "Press Enter to start simulation...";
         cin.get();
     }
@@ -659,10 +683,10 @@ void MarsStation::Simulate()
         AutoAbortPolarMissions(currentDay);
         ManageCheckups(currentDay);
         HandleRescueMissions(currentDay);
+        UpdateBACKMissions(currentDay);
         AssignMissions(currentDay);
         UpdateOUTMissions(currentDay);
         UpdateEXECMissions(currentDay);
-        UpdateBACKMissions(currentDay);
 
         if (mode == 1)
         {
@@ -687,7 +711,47 @@ void MarsStation::Simulate()
     }
     
     cout << "Simulation ends, Output file created" << endl;
-    GenerateOutputFile();
+    GenerateOutputFile(currentDay);
+}
+
+
+MarsStation::~MarsStation()
+{
+    
+    Rover* r = nullptr;
+    
+    while (AvailableDiggingRovers.dequeue(r)) { delete r; }
+    while (AvailablePolarRovers.dequeue(r))   { delete r; }
+    while (AvailableNormalRovers.dequeue(r))  { delete r; }
+    while (CheckupDiggingRovers.dequeue(r))   { delete r; }
+    while (CheckupPolarRovers.dequeue(r))     { delete r; }
+    while (CheckupNormalRovers.dequeue(r))    { delete r; }
+    
+    // === DELETE ALL MISSIONS ===
+    // Missions can be in Ready, OUT, EXEC, BACK, DONE, or Aborted lists
+    Mission* m = nullptr;
+    int pri = 0;
+    
+    // Ready lists (LinkedQueue and derived)
+    while (ReadyDiggingMissions.dequeue(m)) { delete m; }
+    while (ReadyPolarMissions.dequeue(m))   { delete m; }
+    while (ReadyNormalMissions.dequeue(m))  { delete m; }
+    
+    // Priority queue lists (OUT, EXEC, BACK)
+    while (OUTMissions.dequeue(m, pri))  { delete m; }
+    while (EXECMissions.dequeue(m, pri)) { delete m; }
+    while (BACKMissions.dequeue(m, pri)) { delete m; }
+    
+    // Stack (DONE)
+    while (DONEMissions.pop(m)) { delete m; }
+    
+    // Aborted missions
+    while (AbortedMissions.dequeue(m)) { delete m; }
+    
+    // === DELETE ANY REMAINING REQUESTS ===
+    // (Should normally be empty after simulation, but clean up just in case)
+    Requests* req = nullptr;
+    while (RequestsList.dequeue(req)) { delete req; }
 }
 
 LinkedQueue<Rover*>& MarsStation::getCheckupDiggingRovers() { return CheckupDiggingRovers; }

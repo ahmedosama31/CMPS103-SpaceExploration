@@ -45,6 +45,9 @@ public:
     int CR = 0; // Checkup duration (same for all rover types)
     int FP = 5; // Failure probability % 
 
+    
+    ~MarsStation();
+
     void LoadFromFile(const std::string& filename);
 
     // Helper functions
@@ -73,7 +76,7 @@ public:
     void UpdateBACKMissions(int currentDay);
 
     void Simulate();
-    void GenerateOutputFile();
+    void GenerateOutputFile(int totalDays);
 
     // Getters
     LinkedQueue<Rover*>& getCheckupDiggingRovers();

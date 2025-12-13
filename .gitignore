@@ -365,5 +365,9 @@ FodyWeavers.xsd
 .vscode/settings.json
 *.md
 /input.txt
-/Project_Docs
 /Simulation.exe
+*.o
+output.txt
+Project_Docs/Data-Structures-and-Algorithms-Project.txt
+Project_Docs/Phase2-Project-features-weights-F25-weights.csv
+Project_Docs/Workload-Distribution.txt
