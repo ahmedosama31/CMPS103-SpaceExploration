@@ -672,7 +672,7 @@ void MarsStation::Simulate()
     }
 
     int currentDay = 1; 
-    LoadFromFile("input.txt"); 
+    LoadFromFile("input_bonus.txt"); 
 
     if (mode == 1)
     {
