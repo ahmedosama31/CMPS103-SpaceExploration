@@ -70,7 +70,7 @@ public:
     void UpdateBACKMissions(int currentDay);
 
     void Simulate();
-    void GenerateOutputFile();
+    void GenerateOutputFile(int totalDays);
 
     // Getters
     LinkedQueue<Rover*>& getCheckupDiggingRovers();

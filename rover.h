@@ -44,7 +44,7 @@ public:
     void finishCheckup();
     bool needsCheckup() const;
 
-    // Output operators
-    friend ostream& operator<<(ostream& os, const Rover& r);
-    friend ostream& operator<<(ostream& os, const Rover* r);
 };
+
+// Output operator (non-friend, uses public getters)
+ostream& operator<<(ostream& os, const Rover& r);

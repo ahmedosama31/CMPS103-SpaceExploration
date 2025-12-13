@@ -390,7 +390,7 @@ void MarsStation::UpdateBACKMissions(int currentDay)
 }
 
 // Output File Generation
-void MarsStation::GenerateOutputFile()
+void MarsStation::GenerateOutputFile(int totalDays)
 {
     ofstream outputFile("output.txt");
     if (!outputFile.is_open()) {
@@ -479,9 +479,9 @@ void MarsStation::GenerateOutputFile()
     
     int MissionTotalCount = MissionDoneCount + Mission_Aborted;
     
-    double Average_Wdays = (MissionTotalCount > 0) ? ((double)Total_Wdays / MissionTotalCount) : 0.0;
-    double Average_Tdays = (MissionTotalCount > 0) ? ((double)Total_Tdays / MissionTotalCount) : 0.0;
-	double Avg_Mdur = (MissionTotalCount > 0) ? ((double)Total_Mdur / MissionTotalCount) : 0.0;
+    double Average_Wdays = (MissionDoneCount > 0) ? ((double)Total_Wdays / MissionDoneCount) : 0.0;
+    double Average_Tdays = (MissionDoneCount > 0) ? ((double)Total_Tdays / MissionDoneCount) : 0.0;
+	double Avg_Mdur = (MissionDoneCount > 0) ? ((double)Total_Mdur / MissionDoneCount) : 0.0;
     
     int totalPolar = polarDoneCount + polarAbortedCount;
     double autoAbortedPercentage = (totalPolar > 0) ? ((double)polarAbortedCount / totalPolar) * 100.0 : 0.0;
@@ -494,7 +494,9 @@ void MarsStation::GenerateOutputFile()
                << ", Avg Tdays = " << Average_Tdays << endl;
     
     outputFile << "% Avg_Wdays / Avg_MDUR = " << (Avg_Mdur > 0 ? (Average_Wdays / Avg_Mdur) * 100 : 0) << "%"
-               << ", Auto-aborted = " << autoAbortedPercentage << "%" << endl; 
+               << ", Auto-aborted = " << autoAbortedPercentage << "%" << endl;
+    
+    outputFile << "Total Simulation Days = " << totalDays << endl; 
 
     outputFile.close();
 }
@@ -521,7 +523,7 @@ void MarsStation::Simulate()
 
     if (mode == 1)
     {
-        ui.PrintDay(0, this);
+        ui.PrintDay(1, this);
         cout << "Press Enter to start simulation...";
         cin.get();
     }
@@ -559,7 +561,7 @@ void MarsStation::Simulate()
     }
     
     cout << "Simulation ends, Output file created" << endl;
-    GenerateOutputFile();
+    GenerateOutputFile(currentDay);
 }
 
 

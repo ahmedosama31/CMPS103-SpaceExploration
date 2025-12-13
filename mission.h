@@ -42,7 +42,7 @@ public:
     void assignRover(Rover* r);
     void setAborted(bool a);
     
-    friend std::ostream& operator<<(std::ostream& os, const Mission& m);
-    friend std::ostream& operator<<(std::ostream& os, const Mission* m);
-
 };
+
+// Output operator (non-friend, uses public getters)
+std::ostream& operator<<(std::ostream& os, const Mission& m);

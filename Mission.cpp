@@ -30,19 +30,10 @@ void Mission::setAborted(bool a) { Aborted = a; }
 std::ostream& operator<<(std::ostream& os, const Mission& m)
 {
     if (m.getAssignedRover()) {
-        os << m.ID << "/" << m.getAssignedRover()->getID();
+        os << m.getID() << "/" << m.getAssignedRover()->getID();
     }
     else {
-        os << m.ID;
+        os << m.getID();
     }
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const Mission* m)
-{
-    if (m)
-        os << *m;   // call Mission& overload
-    else
-        os << "[NULL Mission]";
     return os;
 }

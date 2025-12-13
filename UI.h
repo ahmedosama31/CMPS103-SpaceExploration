@@ -9,6 +9,4 @@ public:
     UI(){}
 
     void PrintDay(int day, MarsStation* pS);
-
-    int ReadMode();
 };
