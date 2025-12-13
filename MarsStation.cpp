@@ -373,7 +373,6 @@ void MarsStation::UpdateBACKMissions(int currentDay)
         {
             BACKMissions.dequeue(m, pri);
             // Check if the mission was aborted (and moved to BACK as part of abort)
-            // Check if the mission was aborted (and moved to BACK as part of abort)
             if (m->isAborted()) {
                 AbortedMissions.enqueue(m);
             } else {
