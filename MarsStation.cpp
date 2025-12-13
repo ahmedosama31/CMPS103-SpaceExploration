@@ -399,29 +399,31 @@ void MarsStation::UpdateOUTMissions(int currentDay)
 
     while (OUTMissions.peek(m, pri))
     {
-        // Probability of failure: FP%
-        int randFail = rand() % 100;
-        if (randFail < FP) 
-        {
-            OUTMissions.dequeue(m, pri);
-            m->setFailed(true);
-            
-            // Store the failed rover in StrandedRovers list
-            Rover* failedRover = m->getAssignedRover();
-            if (failedRover) {
-                StrandedRovers.enqueue(failedRover);
-                m->assignRover(nullptr); // Unassign rover from mission
-            }
-            
-            // Mission waits for rescue
-            FailedMissions.enqueue(m);
-            continue; 
-        }
-
         int arrivalDay = -pri;
         if (arrivalDay <= currentDay)
         {
             OUTMissions.dequeue(m, pri);
+            
+            // Probability of failure: FP% (only check when mission arrives)
+            // Rescue missions never fail to prevent cascading failures
+            if (!m->isRescued()) {
+                int randFail = rand() % 100;
+                if (randFail < FP) 
+                {
+                    m->setFailed(true);
+                    
+                    // Store the failed rover in StrandedRovers list
+                    Rover* failedRover = m->getAssignedRover();
+                    if (failedRover) {
+                        StrandedRovers.enqueue(failedRover);
+                        m->assignRover(nullptr); // Unassign rover from mission
+                    }
+                    
+                    // Mission waits for rescue
+                    FailedMissions.enqueue(m);
+                    continue; 
+                }
+            }
             
             // Check if this is a RESCUE mission arriving at failed mission location
             if (m->isRescued()) {
@@ -447,7 +449,6 @@ void MarsStation::UpdateOUTMissions(int currentDay)
         }
         else
             break;
-
     }
 }
 
@@ -458,29 +459,32 @@ void MarsStation::UpdateEXECMissions(int currentDay)
 
     while (EXECMissions.peek(m, pri))
     {
-        // Probability of failure: FP%
-        int randFail = rand() % 100;
-        if (randFail < FP) 
-        {
-            EXECMissions.dequeue(m, pri);
-            m->setFailed(true);
-            
-            // Store the failed rover in StrandedRovers list
-            Rover* failedRover = m->getAssignedRover();
-            if (failedRover) {
-                StrandedRovers.enqueue(failedRover);
-                m->assignRover(nullptr); // Unassign rover from mission
-            }
-            
-            // Mission waits for rescue
-            FailedMissions.enqueue(m);
-            continue;
-        }
-
         int Fday = -pri;
         if (Fday <= currentDay) 
         {
             EXECMissions.dequeue(m, pri);
+            
+            // Probability of failure: FP% (only check when mission finishes)
+            // Rescue missions never fail to prevent cascading failures
+            if (!m->isRescued()) {
+                int randFail = rand() % 100;
+                if (randFail < FP) 
+                {
+                    m->setFailed(true);
+                    
+                    // Store the failed rover in StrandedRovers list
+                    Rover* failedRover = m->getAssignedRover();
+                    if (failedRover) {
+                        StrandedRovers.enqueue(failedRover);
+                        m->assignRover(nullptr); // Unassign rover from mission
+                    }
+                    
+                    // Mission waits for rescue
+                    FailedMissions.enqueue(m);
+                    continue;
+                }
+            }
+            
             Rover* assignedRover = m->getAssignedRover();
             if (!assignedRover) {
                 continue;
@@ -489,7 +493,7 @@ void MarsStation::UpdateEXECMissions(int currentDay)
             double targetloc = m->getTargetLocation();
             
             double travelHours = targetloc / speed;
-            int travelDays =ceil(travelHours / 25.0); 
+            int travelDays = ceil(travelHours / 25.0); 
             int returnDay = currentDay + travelDays;
 
             BACKMissions.enqueue(m, -returnDay);
