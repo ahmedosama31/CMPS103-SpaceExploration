@@ -442,12 +442,33 @@ void MarsStation::GenerateOutputFile()
     // Statistics
     int Mission_Aborted = 0;
     LinkedQueue<Mission*> tempAbortedMissions; 
+    
+    // Counters for mission types (Done + Aborted)
+    int nN = 0, nP = 0, nD = 0;
+
+    ArrayStack<Mission*> tempStackForCounts;
+    while (!DONEMissions.isEmpty()) {
+        DONEMissions.pop(m);
+        if (m->getType() == MissionType::Normal) nN++;
+        else if (m->getType() == MissionType::Polar) nP++;
+        else if (m->getType() == MissionType::Digging) nD++;
+        tempStackForCounts.push(m);
+    }
+    while (!tempStackForCounts.isEmpty()) {
+        tempStackForCounts.pop(m);
+        DONEMissions.push(m);
+    }
+
     while (!AbortedMissions.isEmpty()) {
         AbortedMissions.dequeue(m);
         Mission_Aborted++;
-        if (m->getType() == MissionType::Polar) {
+        if (m->getType() == MissionType::Normal) nN++;
+        else if (m->getType() == MissionType::Polar) {
+            nP++;
             polarAbortedCount++;
         }
+        else if (m->getType() == MissionType::Digging) nD++;
+        
         tempAbortedMissions.enqueue(m);
     }
     // Restore AbortedMissions
@@ -458,15 +479,16 @@ void MarsStation::GenerateOutputFile()
     
     int MissionTotalCount = MissionDoneCount + Mission_Aborted;
     
-    double Average_Wdays = (MissionDoneCount > 0) ? ((double)Total_Wdays / MissionDoneCount) : 0.0;
-    double Average_Tdays = (MissionDoneCount > 0) ? ((double)Total_Tdays / MissionDoneCount) : 0.0;
-	double Avg_Mdur = (MissionDoneCount > 0) ? ((double)Total_Mdur / MissionDoneCount) : 0.0;
+    double Average_Wdays = (MissionTotalCount > 0) ? ((double)Total_Wdays / MissionTotalCount) : 0.0;
+    double Average_Tdays = (MissionTotalCount > 0) ? ((double)Total_Tdays / MissionTotalCount) : 0.0;
+	double Avg_Mdur = (MissionTotalCount > 0) ? ((double)Total_Mdur / MissionTotalCount) : 0.0;
     
     int totalPolar = polarDoneCount + polarAbortedCount;
     double autoAbortedPercentage = (totalPolar > 0) ? ((double)polarAbortedCount / totalPolar) * 100.0 : 0.0;
 
-    outputFile << "Missions: " << MissionTotalCount << " [Done: " << MissionDoneCount << ", Aborted: " << Mission_Aborted << "]"
-               << "\nRovers: " << (D + P + N) << " [D: " << D << ", P: " << P << ", N: " << N << "]"
+    outputFile << "Missions: " << MissionTotalCount << " [N: " << nN << ", P: " << nP << ", D: " << nD << "]"
+               << " [Done: " << MissionDoneCount << ", Aborted: " << Mission_Aborted << "]"
+               << "\nRovers: " << (D + P + N) << " [N: " << N << ", P: " << P << ", D: " << D << "]"
                << "\nAvg Wdays = " << Average_Wdays 
                << ", Avg MDUR = " << Avg_Mdur 
                << ", Avg Tdays = " << Average_Tdays << endl;
