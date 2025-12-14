@@ -4,13 +4,13 @@ A Mars station simulation system that manages space exploration missions and rov
 
 ## Overview
 
-This project simulates a Mars station that receives mission requests, assigns them to available rovers, and tracks mission execution. The system implements various data structures including queues, stacks, and priority queues to efficiently manage missions of different types (Emergency, Mountainous, and Polar).
+This project simulates a Mars station that receives mission requests, assigns them to available rovers, and tracks mission execution. The system implements various data structures including queues, stacks, and priority queues to efficiently manage missions of different types (Emergency, Digging, and Polar).
 
 ## Features
 
 - **Mission Management**: Handle multiple types of missions with different priorities
   - Emergency Missions (highest priority)
-  - Mountainous Missions
+  - Digging Missions
   - Polar Missions
   
 - **Rover Fleet**: Manage multiple rovers with different capabilities
